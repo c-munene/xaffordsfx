@@ -1,0 +1,2514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAffordsFX - Professional Forex Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+       
+        :root {
+            --primary: #00ff9d;
+        }
+       
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .logo-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .trade-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+       
+        .trade-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+       
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+       
+        .sidebar-link.active {
+            background-color: #111827;
+            border-left: 4px solid #00ff9d;
+        }
+       
+        .profit {
+            color: #00ff9d;
+        }
+       
+        .loss {
+            color: #ff3b5c;
+        }
+       
+        .screenshot-preview {
+            max-height: 300px;
+            object-fit: contain;
+        }
+        .balance-input {
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Calendar Styles */
+        .calendar-table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #18181b;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .calendar-table th, .calendar-table td {
+            border: 1px solid #27272a;
+            height: 110px;
+            vertical-align: top;
+            position: relative;
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+        .calendar-table th {
+            height: 48px;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #a1a1aa;
+            background: #27272a;
+        }
+        .calendar-day {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            text-align: right;
+        }
+        .calendar-pl {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            width: 88%;
+            padding: 4px 6px;
+            border-radius: 9999px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease;
+        }
+        .calendar-day:hover .calendar-pl {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+        .calendar-day-number {
+            font-weight: 700;
+            color: #e2e8f0;
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .calendar-day.today {
+            background: linear-gradient(145deg, #27272a, #18181b);
+            box-shadow: inset 0 0 0 3px #67e8f9;
+        }
+        .calendar-day.has-trades {
+            background: linear-gradient(145deg, #1f2937, #111827);
+        }
+        .calendar-pl.profit {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            color: #052e16;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+        }
+        .calendar-pl.loss {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            color: #450a0a;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Auth Styles */
+        .auth-card {
+            background: linear-gradient(145deg, #18181b, #27272a);
+        }
+
+        /* Multiple Screenshot Styles */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+        }
+        .screenshot-thumb {
+            position: relative;
+        }
+        .screenshot-thumb img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .screenshot-thumb img:hover {
+            transform: scale(1.05);
+        }
+        .remove-screenshot {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ff3b5c;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        #lightbox img {
+            max-width: 95%;
+            max-height: 92vh;
+            border-radius: 12px;
+        }
+
+        /* Enhanced Journal Table */
+        .journal-table th {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+        .journal-table th:hover {
+            color: #00ff9d;
+        }
+        .journal-table th.sort-asc::after {
+            content: '↑';
+            position: absolute;
+            right: 8px;
+        }
+        .journal-table th.sort-desc::after {
+            content: '↓';
+            position: absolute;
+            right: 8px;
+        }
+        .trade-row {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .trade-row:hover {
+            background-color: #27272a !important;
+            transform: scale(1.01);
+        }
+        .filter-chip {
+            transition: all 0.2s;
+        }
+
+        /* New Trade Enhancements */
+        .input-focus {
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2);
+            border-color: #00ff9d;
+        }
+
+        .pl-preview {
+            transition: all 0.3s ease;
+        }
+
+        /* Dashboard glow effects */
+        .dashboard-glow {
+            box-shadow: 0 0 35px -5px rgb(16 185 129);
+        }
+
+        /* Enhanced Notes / Notebook Styles */
+        .notes-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        
+        .notes-content strong {
+            font-weight: 700;
+            color: #00ff9d;
+        }
+        
+        .notes-content em {
+            font-style: italic;
+            color: #a5b4fc;
+        }
+        
+        .notes-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #e0f2fe;
+        }
+        
+        .rich-text-editor {
+            min-height: 180px;
+            max-height: 320px;
+            overflow-y: auto;
+            resize: vertical;
+        }
+        
+        .format-btn {
+            transition: all 0.1s ease;
+        }
+        .format-btn.active {
+            background-color: #00ff9d;
+            color: black;
+        }
+
+        /* Enhanced Auth */
+        .strength-meter {
+            height: 6px;
+            background: #27272a;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+        .error-msg {
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        .input-success {
+            border-color: #34d399;
+        }
+
+        /* Header Account */
+        .header-account {
+            transition: all 0.2s ease;
+        }
+
+        /* Account Selector */
+        .account-selector {
+            position: relative;
+        }
+        
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            width: 240px;
+            z-index: 50;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        }
+        
+        .account-selector:hover .account-dropdown {
+            display: block;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .calendar-table th, .calendar-table td {
+                height: 90px;
+                padding: 6px 4px;
+            }
+            .calendar-pl {
+                font-size: 0.8rem;
+                padding: 3px 5px;
+            }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Professional Analytics */
+        .metric-card {
+            background: linear-gradient(145deg, #18181b, #27272a);
+        }
+
+        /* Adjust Balance Modal */
+        .modal {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Enhanced Chart Styles */
+        .chart-container {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100">
+    <!-- Auth Container -->
+    <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="max-w-md w-full mx-auto">
+            <!-- Login Form -->
+            <div id="login-form" class="auth-card rounded-3xl p-8 md:p-10 border border-zinc-700 shadow-2xl">
+                <div class="flex items-center gap-3 justify-center mb-8">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-black font-bold text-4xl">X</div>
+                    <div class="text-4xl font-bold tracking-tight logo-font">XAffordsFX</div>
+                </div>
+                <h2 class="text-3xl font-bold text-center mb-2">Welcome Back</h2>
+                <p class="text-zinc-400 text-center mb-8">Sign in to access your trading journal</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Username</label>
+                        <input id="login-username" type="text" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="Enter username">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Password</label>
+                        <input id="login-password" type="password" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="Enter password">
+                    </div>
+                    
+                    <button onclick="handleLogin()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-4 rounded-2xl transition">
+                        Sign In
+                    </button>
+                    
+                    <div class="text-center">
+                        <button onclick="showSignup()" 
+                                class="text-emerald-500 hover:text-emerald-400 text-sm">
+                            Don't have an account? Sign up
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-card hidden rounded-3xl p-8 md:p-10 border border-zinc-700 shadow-2xl">
+                <div class="flex items-center gap-3 justify-center mb-8">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-black font-bold text-4xl">X</div>
+                    <div class="text-4xl font-bold tracking-tight logo-font">XAffordsFX</div>
+                </div>
+                <h2 class="text-3xl font-bold text-center mb-2">Create Account</h2>
+                <p class="text-zinc-400 text-center mb-8">Start tracking your forex journey</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Username</label>
+                        <input id="signup-username" type="text" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="Choose username" oninput="checkUsernameAvailability()">
+                        <div id="username-feedback" class="error-msg"></div>
+                    </div>
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Email</label>
+                        <input id="signup-email" type="email" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="you@example.com">
+                        <div id="email-feedback" class="error-msg"></div>
+                    </div>
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Password</label>
+                        <input id="signup-password" type="password" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="Create strong password" oninput="updatePasswordStrength()">
+                        <div class="strength-meter">
+                            <div id="strength-bar" class="strength-bar bg-red-500"></div>
+                        </div>
+                        <div id="password-strength-text" class="text-xs mt-1 text-zinc-500">Password strength</div>
+                        <div id="password-feedback" class="error-msg"></div>
+                    </div>
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Confirm Password</label>
+                        <input id="signup-confirm" type="password" 
+                               class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="Confirm password" oninput="checkPasswordMatch()">
+                        <div id="confirm-feedback" class="error-msg"></div>
+                    </div>
+                    
+                    <button onclick="handleSignup()" id="signup-btn"
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-4 rounded-2xl transition disabled:opacity-50"
+                            disabled>
+                        Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <button onclick="showLogin()" 
+                                class="text-emerald-500 hover:text-emerald-400 text-sm">
+                            Already have an account? Sign in
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" class="hidden flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col fixed md:static h-full z-50 md:translate-x-0 transition-transform">
+            <div class="p-6 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center text-black font-bold text-2xl">X</div>
+                    <div>
+                        <span class="text-2xl font-bold tracking-tight logo-font">XAffordsFX</span>
+                    </div>
+                </div>
+                <p class="text-zinc-500 text-sm mt-1">Professional Forex Journal</p>
+            </div>
+           
+            <div class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+                <a href="#" onclick="navigate(0); toggleMobileMenu()" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-300 hover:text-white" id="nav-0">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="#" onclick="navigate(1); toggleMobileMenu()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-300 hover:text-white" id="nav-1">
+                    <i class="fas fa-plus w-5"></i>
+                    <span class="font-medium">Log New Trade</span>
+                </a>
+                <a href="#" onclick="navigate(2); toggleMobileMenu()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-300 hover:text-white" id="nav-2">
+                    <i class="fas fa-book w-5"></i>
+                    <span class="font-medium">My Journal</span>
+                </a>
+                <a href="#" onclick="navigate(3); toggleMobileMenu()" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-300 hover:text-white" id="nav-3">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span class="font-medium">Analytics</span>
+                </a>
+            </div>
+           
+            <div class="p-4 border-t border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div id="user-avatar" class="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div id="current-username" class="font-medium truncate">User</div>
+                        <div class="text-xs text-zinc-500">Nairobi • Kenya</div>
+                    </div>
+                </div>
+                <button onclick="logout()" 
+                        class="mt-6 w-full text-red-400 hover:text-red-500 text-sm flex items-center justify-center gap-2 py-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+       
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content md:ml-0">
+            <!-- Top Bar -->
+            <div class="h-14 bg-zinc-900 border-b border-zinc-800 px-4 md:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-2xl text-zinc-400 hover:text-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold" id="page-title">Dashboard</h1>
+                </div>
+               
+                <!-- Account Selector -->
+                <div class="flex items-center gap-6 header-account">
+                    <div onclick="showAccountSelector()" class="account-selector flex items-center gap-3 cursor-pointer group">
+                        <div class="text-right">
+                            <div id="header-account-name" class="text-sm font-medium text-zinc-300 group-hover:text-white">Main Account</div>
+                            <div id="header-balance" class="text-emerald-400 font-mono text-lg">$10,000.00</div>
+                        </div>
+                        <div class="w-8 h-8 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-4 md:p-8 bg-zinc-950" id="content-area">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- Account Balance -->
+                        <div class="lg:col-span-2 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-zinc-700 dashboard-glow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <p class="text-zinc-400 text-sm">Account Balance</p>
+                                    </div>
+                                    <p class="text-4xl md:text-5xl font-bold mt-3" id="account-balance">$10,000.00</p>
+                                    <p class="text-emerald-500 text-sm mt-2 flex items-center gap-1" id="balance-change">
+                                        +$0.00 (+0.00%)
+                                    </p>
+                                </div>
+                                <div>
+                                    <button onclick="showAdjustBalanceModal()" 
+                                            class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 hover:border-emerald-500 text-sm flex items-center gap-2 rounded-2xl transition-all duration-200">
+                                        <i class="fas fa-sliders-h"></i>
+                                        <span class="font-medium">Adjust</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-6 text-xs text-zinc-500 flex flex-wrap items-center gap-4">
+                                <div>Starting: <span id="starting-balance-display" class="font-medium text-zinc-300">$10,000.00</span></div>
+                                <div class="h-3 w-px bg-zinc-700 hidden sm:block"></div>
+                                <div>Total P/L: <span id="total-pl-display" class="font-medium text-emerald-500">+$0.00</span></div>
+                            </div>
+                        </div>
+                       
+                        <!-- Win Rate -->
+                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-zinc-400 text-sm">Win Rate</p>
+                                    <p class="text-4xl font-bold mt-2" id="win-rate">0%</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 text-sm">
+                                <div class="h-2 bg-zinc-800 rounded-full mt-2 overflow-hidden">
+                                    <div id="win-rate-bar" class="h-full bg-emerald-500 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs mt-3">
+                                    <span class="text-emerald-400" id="wins-display">0 Wins</span>
+                                    <span class="text-red-400" id="losses-count">0 Losses</span>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        <!-- Avg R:R -->
+                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-zinc-400 text-sm">Avg R:R</p>
+                                    <p class="text-4xl font-bold mt-2" id="avg-rr">—</p>
+                                </div>
+                                <i class="fas fa-balance-scale text-3xl text-sky-500"></i>
+                            </div>
+                            <p class="text-zinc-400 text-xs mt-6" id="rr-trades-info">Based on trades with SL &amp; TP</p>
+                        </div>
+                       
+                        <!-- Total Trades -->
+                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-zinc-400 text-sm">Total Trades</p>
+                                    <p class="text-4xl font-bold mt-2" id="total-trades">0</p>
+                                </div>
+                                <i class="fas fa-exchange-alt text-3xl text-emerald-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <!-- Calendar -->
+                    <div class="mt-8 md:mt-10 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-zinc-700">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-semibold flex items-center gap-3">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Daily P/L Calendar
+                                </h2>
+                                <div id="monthly-total" class="text-sm mt-1 text-zinc-400"></div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <button onclick="prevMonth()" class="px-4 py-2 hover:bg-zinc-800 rounded-2xl transition">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="calendar-month" class="font-medium text-lg w-48 text-center"></span>
+                                <button onclick="nextMonth()" class="px-4 py-2 hover:bg-zinc-800 rounded-2xl transition">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table id="calendar-table" class="calendar-table text-xs min-w-full"></table>
+                        </div>
+                    </div>
+                   
+                    <!-- Recent Trades -->
+                    <div class="mt-8 md:mt-10">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Recent Trades</h2>
+                            <a href="#" onclick="navigate(2)" class="text-emerald-500 hover:text-emerald-400 text-sm flex items-center gap-1">
+                                View All <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                       
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recent-trades">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- New Trade Form -->
+                <div id="new-trade-content" class="hidden">
+                    <div class="max-w-3xl mx-auto bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
+                        <h2 class="text-2xl font-bold mb-8 flex items-center gap-3" id="form-title">
+                            <i class="fas fa-plus"></i>
+                            Log New Trade
+                        </h2>
+                       
+                        <form id="trade-form" onsubmit="saveTrade(event)">
+                            <input type="hidden" id="edit-trade-id">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Date &amp; Time</label>
+                                    <input type="datetime-local" id="trade-date" 
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Instrument</label>
+                                    <input type="text" id="trade-pair" list="pair-suggestions"
+                                           placeholder="EURUSD"
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 uppercase font-medium input-focus" required>
+                                    <datalist id="pair-suggestions">
+                                        <option value="EURUSD"><option value="GBPUSD"><option value="USDJPY"><option value="AUDUSD">
+                                        <option value="USDCAD"><option value="USDCHF"><option value="NZDUSD"><option value="XAUUSD">
+                                        <option value="XAGUSD"><option value="US30"><option value="NASDAQ"><option value="USOIL">
+                                        <option value="BTCUSD"><option value="ETHUSD"><option value="SPX500"><option value="GER40">
+                                    </datalist>
+                                </div>
+                            </div>
+                           
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Direction</label>
+                                    <select id="trade-direction" onchange="updatePLPreview()" 
+                                            class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                        <option value="Buy">Buy</option>
+                                        <option value="Sell">Sell</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Entry Price</label>
+                                    <input type="number" step="0.00001" id="entry-price" oninput="updatePLPreview()"
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Exit Price</label>
+                                    <input type="number" step="0.00001" id="exit-price" oninput="updatePLPreview()"
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                </div>
+                            </div>
+                           
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Stop Loss</label>
+                                    <input type="number" step="0.00001" id="stop-loss" 
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Take Profit</label>
+                                    <input type="number" step="0.00001" id="take-profit" 
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-400 text-sm mb-2">Size (Lots)</label>
+                                    <input type="number" step="0.01" id="lot-size" value="0.1" oninput="updatePLPreview()"
+                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                </div>
+                            </div>
+
+                            <!-- Live P/L Preview -->
+                            <div id="pl-preview" class="mt-6 p-4 bg-zinc-950 border border-zinc-700 rounded-2xl hidden">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-zinc-400">Estimated P/L</span>
+                                    <span id="preview-pl" class="text-2xl font-bold"></span>
+                                </div>
+                            </div>
+                           
+                            <div class="mt-8">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="block text-zinc-400 text-sm">Trade Reason / Setup <span class="text-emerald-400 text-xs">(Markdown supported)</span></label>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="formatText('bold')" class="format-btn px-3 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 rounded-xl flex items-center gap-1">
+                                            <i class="fas fa-bold"></i>
+                                        </button>
+                                        <button type="button" onclick="formatText('italic')" class="format-btn px-3 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 rounded-xl flex items-center gap-1">
+                                            <i class="fas fa-italic"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="trade-reason-editor" contenteditable="true"
+                                     class="rich-text-editor w-full bg-zinc-800 border border-zinc-700 rounded-3xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus text-zinc-100"
+                                     placeholder="Describe your setup, market structure, bias..."></div>
+                                <input type="hidden" id="trade-reason">
+                            </div>
+                           
+                            <div class="mt-6">
+                                <label class="block text-zinc-400 text-sm mb-2">Screenshots / Charts <span class="text-emerald-400 text-xs">(Multiple allowed)</span></label>
+                                <div class="border border-dashed border-zinc-700 rounded-3xl p-8 text-center hover:border-emerald-500 transition-colors">
+                                    <input type="file" id="trade-screenshots" accept="image/*" multiple class="hidden" onchange="previewMultipleImages(event)">
+                                    <button type="button" onclick="document.getElementById('trade-screenshots').click()"
+                                            class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm flex items-center gap-2 mx-auto">
+                                        <i class="fas fa-upload"></i>
+                                        Upload Screenshots
+                                    </button>
+                                    <p class="text-xs text-zinc-500 mt-3">PNG, JPG up to 5MB each</p>
+                                </div>
+                                <div id="image-preview-container" class="mt-4 screenshot-grid"></div>
+                            </div>
+                           
+                            <div class="flex flex-col sm:flex-row gap-4 mt-10">
+                                <button type="submit"
+                                        class="flex-1 bg-emerald-500 text-black font-semibold py-4 rounded-2xl hover:bg-emerald-600 transition" id="save-btn">
+                                    Save Trade
+                                </button>
+                                <button type="button" onclick="cancelForm()"
+                                        class="flex-1 border border-zinc-700 font-semibold py-4 rounded-2xl hover:bg-zinc-900 transition">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+               
+                <!-- Enhanced Journal Content -->
+                <div id="journal-content" class="hidden">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+                        <!-- Search and Filters -->
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <div class="relative flex-1 min-w-[240px]">
+                                <input type="text" id="search-input"
+                                       onkeyup="filterTrades()"
+                                       placeholder="Search pairs, notes..."
+                                       class="bg-zinc-900 border border-zinc-700 rounded-3xl px-6 py-4 w-full focus:outline-none focus:border-emerald-500 input-focus">
+                                <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                            </div>
+                            
+                            <!-- Quick Filters -->
+                            <div onclick="toggleFilter(this)" data-filter="all" class="filter-chip active px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
+                                <i class="fas fa-list"></i>
+                                <span>All</span>
+                            </div>
+                            <div onclick="toggleFilter(this)" data-filter="profit" class="filter-chip px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
+                                <i class="fas fa-arrow-trend-up text-emerald-400"></i>
+                                <span>Profits</span>
+                            </div>
+                            <div onclick="toggleFilter(this)" data-filter="loss" class="filter-chip px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
+                                <i class="fas fa-arrow-trend-down text-red-400"></i>
+                                <span>Losses</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <button onclick="exportJournal()"
+                                    class="px-5 py-3 border border-zinc-700 rounded-2xl hover:bg-zinc-800 flex items-center gap-2 whitespace-nowrap">
+                                <i class="fas fa-download"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800">
+                        <div class="table-container">
+                            <table class="w-full journal-table min-w-[800px]" id="journal-table-wrapper">
+                                <thead>
+                                    <tr class="border-b border-zinc-800 bg-zinc-950">
+                                        <th onclick="sortTable(1)" class="text-left py-5 px-6 font-medium text-zinc-400">Date</th>
+                                        <th onclick="sortTable(2)" class="text-left py-5 px-6 font-medium text-zinc-400">Pair</th>
+                                        <th onclick="sortTable(3)" class="text-left py-5 px-6 font-medium text-zinc-400">Direction</th>
+                                        <th onclick="sortTable(4)" class="text-left py-5 px-6 font-medium text-zinc-400">Entry / Exit</th>
+                                        <th onclick="sortTable(7)" class="text-left py-5 px-6 font-medium text-zinc-400">Lots</th>
+                                        <th onclick="sortTable(5)" class="text-left py-5 px-6 font-medium text-zinc-400">P/L</th>
+                                        <th onclick="sortTable(6)" class="text-left py-5 px-6 font-medium text-zinc-400">Balance</th>
+                                        <th class="text-left py-5 px-6 font-medium text-zinc-400">Screenshots</th>
+                                        <th class="w-24 py-5 px-6"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="journal-table" class="text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 px-2 text-sm">
+                        <div class="text-zinc-400" id="page-info">Showing 1-10 of 0</div>
+                        <div class="flex gap-2">
+                            <button onclick="prevPage()" id="prev-page-btn" 
+                                    class="px-4 py-2 border border-zinc-700 rounded-2xl hover:bg-zinc-800 disabled:opacity-50">Previous</button>
+                            <button onclick="nextPage()" id="next-page-btn"
+                                    class="px-4 py-2 border border-zinc-700 rounded-2xl hover:bg-zinc-800 disabled:opacity-50">Next</button>
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- Professional Analytics Content -->
+                <div id="analytics-content" class="hidden">
+                    <div class="space-y-8">
+                        <!-- Professional Summary Stats -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-zinc-400 text-sm">Net P/L</p>
+                                    <i class="fas fa-dollar-sign text-emerald-400"></i>
+                                </div>
+                                <p id="analytics-total-pl" class="text-4xl font-bold mt-3 profit">$0.00</p>
+                                <div id="analytics-total-pl-pct" class="text-xs mt-1 text-emerald-400">+0.00%</div>
+                            </div>
+                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-zinc-400 text-sm">Win Rate</p>
+                                    <i class="fas fa-trophy text-amber-400"></i>
+                                </div>
+                                <p id="analytics-winrate" class="text-4xl font-bold mt-3">0.0%</p>
+                            </div>
+                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-zinc-400 text-sm">Profit Factor</p>
+                                    <i class="fas fa-chart-line text-sky-400"></i>
+                                </div>
+                                <p id="analytics-profit-factor" class="text-4xl font-bold mt-3">0.00</p>
+                            </div>
+                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-zinc-400 text-sm">Expectancy</p>
+                                    <i class="fas fa-calculator text-violet-400"></i>
+                                </div>
+                                <p id="analytics-expectancy" class="text-4xl font-bold mt-3">$0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Enhanced Equity Curve -->
+                            <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                                        <i class="fas fa-chart-line"></i>
+                                        Equity Curve
+                                    </h3>
+                                    <div class="text-xs text-zinc-500 flex items-center gap-4">
+                                        <div class="flex items-center gap-1">
+                                            <div class="w-3 h-px bg-emerald-500"></div>
+                                            <span>Equity</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chart-container" style="height: 320px;">
+                                    <canvas id="equityChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced Monthly Performance -->
+                            <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                                        <i class="fas fa-calendar"></i>
+                                        Monthly Performance
+                                    </h3>
+                                    <select id="monthly-view-select" onchange="renderAnalytics()" class="bg-zinc-800 border border-zinc-700 rounded-xl text-sm px-3 py-1">
+                                        <option value="bar">Bar Chart</option>
+                                        <option value="line">Line Trend</option>
+                                    </select>
+                                </div>
+                                <div class="chart-container" style="height: 320px;">
+                                    <canvas id="monthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pair Performance -->
+                        <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
+                            <h3 class="text-lg font-semibold mb-6">Instrument Performance</h3>
+                            <div class="flex justify-center mb-8">
+                                <div class="w-full max-w-md">
+                                    <canvas id="pairPieChart" width="400" height="400"></canvas>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm" id="pair-performance-table">
+                                    <thead>
+                                        <tr class="border-b border-zinc-700">
+                                            <th class="text-left py-3">Pair</th>
+                                            <th class="text-right py-3">Trades</th>
+                                            <th class="text-right py-3">Win %</th>
+                                            <th class="text-right py-3">Avg P/L</th>
+                                            <th class="text-right py-3">Total P/L</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pair-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <!-- Trade Detail Modal -->
+    <div id="trade-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-zinc-900 rounded-3xl w-full max-w-3xl mx-auto max-h-[92vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-2xl font-bold" id="modal-pair"></h3>
+                <button onclick="closeModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+            </div>
+           
+            <div class="p-6 overflow-auto flex-1" id="modal-content">
+                <!-- Populated by JS -->
+            </div>
+           
+            <div class="p-6 border-t border-zinc-800 flex justify-end gap-4">
+                <button onclick="closeModal()"
+                        class="px-8 py-3 border border-zinc-700 rounded-2xl hover:bg-zinc-800">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Accounts Management Modal -->
+    <div id="accounts-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-zinc-900 rounded-3xl w-full max-w-lg mx-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold">Trading Accounts</h3>
+                    <button onclick="closeAccountsModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+                </div>
+                
+                <div id="accounts-list" class="space-y-3 mb-8 max-h-96 overflow-auto">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="border-t border-zinc-700 pt-6">
+                    <div class="flex gap-3">
+                        <input type="text" id="new-account-name" 
+                               class="flex-1 bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus"
+                               placeholder="New Account Name (e.g. Prop Firm)">
+                    </div>
+                    <button onclick="addNewAccount()" 
+                            class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-4 rounded-2xl transition">
+                        + Add New Account
+                    </button>
+                </div>
+                
+                <div class="text-xs text-zinc-500 mt-6">
+                    All accounts are stored locally in your browser.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adjust Balance Modal -->
+    <div id="adjust-balance-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="modal bg-zinc-900 rounded-3xl w-full max-w-md mx-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold">Adjust Balance</h3>
+                    <button onclick="closeAdjustBalanceModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">Current Balance</label>
+                        <div id="current-balance-display" class="text-4xl font-mono font-bold text-emerald-400">$10,000.00</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-zinc-400 text-sm mb-2">New Balance</label>
+                        <input type="number" id="new-balance-input" step="0.01" 
+                               class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus text-3xl font-mono">
+                    </div>
+                    
+                    <div class="pt-4 border-t border-zinc-700">
+                        <label class="block text-zinc-400 text-sm mb-2">Or Adjustment Amount</label>
+                        <div class="flex gap-3">
+                            <button onclick="quickAdjust(100)" 
+                                    class="flex-1 py-3 bg-zinc-800 hover:bg-emerald-900/30 rounded-2xl text-emerald-400 text-sm">+ $100</button>
+                            <button onclick="quickAdjust(500)" 
+                                    class="flex-1 py-3 bg-zinc-800 hover:bg-emerald-900/30 rounded-2xl text-emerald-400 text-sm">+ $500</button>
+                            <button onclick="quickAdjust(1000)" 
+                                    class="flex-1 py-3 bg-zinc-800 hover:bg-emerald-900/30 rounded-2xl text-emerald-400 text-sm">+ $1,000</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex gap-3">
+                    <button onclick="applyBalanceAdjustment()" 
+                            class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-4 rounded-2xl transition">
+                        Update Balance
+                    </button>
+                    <button onclick="closeAdjustBalanceModal()" 
+                            class="flex-1 border border-zinc-700 font-semibold py-4 rounded-2xl hover:bg-zinc-800 transition">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox for screenshots -->
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-image" src="" alt="Screenshot" onclick="event.stopImmediatePropagation()">
+    </div>
+
+    <script>
+        // Simple SHA-256 like hash for demo
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(36);
+        }
+
+        let currentUser = null;
+        let accounts = [];
+        let currentAccountId = null;
+
+        let pieChartInstance = null;
+        let equityChartInstance = null;
+        let monthlyChartInstance = null;
+        let currentCalendarDate = new Date();
+        let currentScreenshots = [];
+
+        // Journal enhancements
+        let currentSort = { column: 1, direction: 'desc' };
+        let currentFilter = 'all';
+        let currentPage = 1;
+        const PAGE_SIZE = 15;
+
+        // Users storage
+        function getUsers() {
+            const users = localStorage.getItem('xaffordsfx_users');
+            return users ? JSON.parse(users) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('xaffordsfx_users', JSON.stringify(users));
+        }
+
+        function getUserAccounts(username) {
+            const data = localStorage.getItem(`xaffordsfx_accounts_${username}`);
+            if (data) {
+                return JSON.parse(data);
+            }
+            // Default account
+            return [{
+                id: 'acc_main',
+                name: 'Main Account',
+                startingBalance: 10000,
+                trades: []
+            }];
+        }
+
+        function saveUserAccounts(username, accs) {
+            localStorage.setItem(`xaffordsfx_accounts_${username}`, JSON.stringify(accs));
+        }
+
+        function getCurrentAccount() {
+            return accounts.find(a => a.id === currentAccountId) || accounts[0];
+        }
+
+        function setCurrentAccount(id) {
+            currentAccountId = id;
+            localStorage.setItem(`xaffordsfx_current_account_${currentUser.username}`, id);
+        }
+
+        // Enhanced Signup validations
+        let usernameAvailable = false;
+        let passwordStrength = 0;
+
+        function checkUsernameAvailability() {
+            const usernameInput = document.getElementById('signup-username');
+            const feedback = document.getElementById('username-feedback');
+            const username = usernameInput.value.trim().toLowerCase();
+            
+            if (username.length < 3) {
+                feedback.innerHTML = `<span class="text-amber-400">Username must be at least 3 characters</span>`;
+                usernameAvailable = false;
+                updateSignupButton();
+                return;
+            }
+            
+            const users = getUsers();
+            const exists = users.find(u => u.username.toLowerCase() === username);
+            
+            if (exists) {
+                feedback.innerHTML = `<span class="text-red-400">Username already taken</span>`;
+                usernameAvailable = false;
+            } else {
+                feedback.innerHTML = `<span class="text-emerald-400">✓ Username available</span>`;
+                usernameAvailable = true;
+            }
+            updateSignupButton();
+        }
+
+        function updatePasswordStrength() {
+            const password = document.getElementById('signup-password').value;
+            const bar = document.getElementById('strength-bar');
+            const text = document.getElementById('password-strength-text');
+            const feedback = document.getElementById('password-feedback');
+            
+            let strength = 0;
+            let color = 'bg-red-500';
+            let label = 'Weak';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^A-Za-z0-9]/)) strength++;
+            
+            passwordStrength = strength;
+            
+            if (strength === 0) {
+                color = 'bg-red-500';
+                label = 'Very Weak';
+            } else if (strength === 1) {
+                color = 'bg-red-500';
+                label = 'Weak';
+            } else if (strength === 2) {
+                color = 'bg-yellow-500';
+                label = 'Medium';
+            } else if (strength === 3) {
+                color = 'bg-emerald-500';
+                label = 'Strong';
+            } else {
+                color = 'bg-emerald-500';
+                label = 'Very Strong';
+            }
+            
+            bar.style.width = `${(strength / 4) * 100}%`;
+            bar.className = `strength-bar ${color}`;
+            text.textContent = label;
+            
+            if (password.length > 0 && strength < 3) {
+                feedback.innerHTML = `<span class="text-amber-400">Password should include uppercase, number, and symbol</span>`;
+            } else {
+                feedback.innerHTML = '';
+            }
+            
+            checkPasswordMatch();
+            updateSignupButton();
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            const feedback = document.getElementById('confirm-feedback');
+            
+            if (confirm.length === 0) {
+                feedback.innerHTML = '';
+                updateSignupButton();
+                return;
+            }
+            
+            if (password === confirm) {
+                feedback.innerHTML = `<span class="text-emerald-400">✓ Passwords match</span>`;
+            } else {
+                feedback.innerHTML = `<span class="text-red-400">Passwords do not match</span>`;
+            }
+            updateSignupButton();
+        }
+
+        function updateSignupButton() {
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            const isValid = username.length >= 3 && 
+                           usernameAvailable && 
+                           email.length > 5 && 
+                           password.length >= 6 && 
+                           password === confirm &&
+                           passwordStrength >= 2;
+            
+            document.getElementById('signup-btn').disabled = !isValid;
+        }
+
+        function handleSignup() {
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+
+            if (!username || !email || !password) {
+                alert("All fields are required");
+                return;
+            }
+            if (password !== confirm) {
+                alert("Passwords do not match");
+                return;
+            }
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters");
+                return;
+            }
+            if (passwordStrength < 2) {
+                alert("Please use a stronger password");
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                alert("Username already taken");
+                return;
+            }
+
+            const hashedPassword = simpleHash(password);
+            
+            users.push({
+                username: username,
+                email: email,
+                passwordHash: hashedPassword,
+                createdAt: new Date().toISOString()
+            });
+            
+            saveUsers(users);
+            
+            alert("Account created successfully! Please sign in.");
+            showLogin();
+            document.getElementById('login-username').value = username;
+            
+            // Reset form
+            document.getElementById('signup-username').value = '';
+            document.getElementById('signup-email').value = '';
+            document.getElementById('signup-password').value = '';
+            document.getElementById('signup-confirm').value = '';
+            document.getElementById('username-feedback').innerHTML = '';
+            document.getElementById('password-feedback').innerHTML = '';
+            document.getElementById('confirm-feedback').innerHTML = '';
+            document.getElementById('strength-bar').style.width = '0%';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                alert("Please enter username and password");
+                return;
+            }
+
+            const users = getUsers();
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+            
+            if (!user) {
+                alert("User not found");
+                return;
+            }
+
+            const hashedInput = simpleHash(password);
+            if (hashedInput !== user.passwordHash) {
+                alert("Incorrect password");
+                return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('xaffordsfx_current_user', JSON.stringify(currentUser));
+            
+            // Load accounts
+            accounts = getUserAccounts(currentUser.username);
+            currentAccountId = localStorage.getItem(`xaffordsfx_current_account_${currentUser.username}`) || accounts[0].id;
+            
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            document.getElementById('current-username').textContent = currentUser.username;
+            navigate(0);
+        }
+
+        function logout() {
+            if (confirm("Sign out of your account?")) {
+                currentUser = null;
+                localStorage.removeItem('xaffordsfx_current_user');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('auth-container').classList.remove('hidden');
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('signup-form').classList.add('hidden');
+        }
+
+        function showSignup() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('signup-form').classList.remove('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function loadAccountData() {
+            if (!currentUser) return;
+            accounts = getUserAccounts(currentUser.username);
+            const savedCurrentId = localStorage.getItem(`xaffordsfx_current_account_${currentUser.username}`);
+            if (savedCurrentId && accounts.find(a => a.id === savedCurrentId)) {
+                currentAccountId = savedCurrentId;
+            } else {
+                currentAccountId = accounts[0].id;
+            }
+        }
+
+        function saveCurrentAccountData() {
+            if (!currentUser) return;
+            saveUserAccounts(currentUser.username, accounts);
+        }
+
+        function navigate(page) {
+            document.getElementById('dashboard-content').classList.add('hidden');
+            document.getElementById('new-trade-content').classList.add('hidden');
+            document.getElementById('journal-content').classList.add('hidden');
+            document.getElementById('analytics-content').classList.add('hidden');
+           
+            for (let i = 0; i < 4; i++) {
+                const nav = document.getElementById(`nav-${i}`);
+                if (nav) nav.classList.remove('active');
+            }
+           
+            document.getElementById(`nav-${page}`).classList.add('active');
+           
+            if (page === 0) {
+                document.getElementById('dashboard-content').classList.remove('hidden');
+                document.getElementById('page-title').textContent = 'Dashboard';
+                renderDashboard();
+            } else if (page === 1) {
+                document.getElementById('new-trade-content').classList.remove('hidden');
+                document.getElementById('page-title').textContent = 'Log Trade';
+                resetNewTradeForm();
+            } else if (page === 2) {
+                document.getElementById('journal-content').classList.remove('hidden');
+                document.getElementById('page-title').textContent = 'My Journal';
+                currentPage = 1;
+                renderJournal();
+            } else if (page === 3) {
+                document.getElementById('analytics-content').classList.remove('hidden');
+                document.getElementById('page-title').textContent = 'Analytics';
+                renderAnalytics();
+            }
+            
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 768) sidebar.classList.remove('open');
+        }
+
+        function resetNewTradeForm() {
+            document.getElementById('trade-form').reset();
+            document.getElementById('image-preview-container').innerHTML = '';
+            currentScreenshots = [];
+            document.getElementById('form-title').innerHTML = `<i class="fas fa-plus"></i> Log New Trade`;
+            document.getElementById('save-btn').textContent = 'Save Trade';
+            document.getElementById('pl-preview').classList.add('hidden');
+            document.getElementById('trade-reason-editor').innerHTML = '';
+            
+            const now = new Date();
+            const localDate = now.toISOString().slice(0,16);
+            document.getElementById('trade-date').value = localDate;
+            document.getElementById('lot-size').value = "0.1";
+        }
+       
+        function previewMultipleImages(e) {
+            const files = e.target.files;
+            const container = document.getElementById('image-preview-container');
+           
+            for (let file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("File too large. Max 5MB.");
+                    continue;
+                }
+               
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const screenshotData = ev.target.result;
+                    currentScreenshots.push(screenshotData);
+                   
+                    const thumb = document.createElement('div');
+                    thumb.className = 'screenshot-thumb';
+                    thumb.innerHTML = `
+                        <img src="${screenshotData}" alt="Preview" onclick="showLightbox('${screenshotData}')">
+                        <div class="remove-screenshot" onclick="removeScreenshot(this)">×</div>
+                    `;
+                    container.appendChild(thumb);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+       
+        function removeScreenshot(el) {
+            const index = Array.from(el.parentElement.parentElement.children).indexOf(el.parentElement);
+            currentScreenshots.splice(index, 1);
+            el.parentElement.remove();
+        }
+
+        function showLightbox(src) {
+            document.getElementById('lightbox-image').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+       
+        function renderMarkdown(text) {
+            if (!text) return '';
+            let html = text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/\n/g, '<br>');
+            return html;
+        }
+
+        // === ENHANCED PIP & LOT CALCULATION ===
+        function getPipMultiplier(pair) {
+            if (!pair) return 100000;
+            const p = pair.toUpperCase().trim();
+            
+            // Major Forex Pairs (pip = 0.0001)
+            if (['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURGBP', 'EURJPY', 'GBPJPY', 'AUDJPY'].includes(p)) {
+                return 100000; // 1 standard lot = 10 USD per pip
+            }
+            
+            // JPY Pairs (pip = 0.01)
+            if (p.endsWith('JPY')) {
+                return 1000;
+            }
+            
+            // Metals
+            if (p === 'XAUUSD' || p === 'GOLD') { // Gold - 100 ounces per lot, pip 0.01 = $1
+                return 100;
+            }
+            if (p === 'XAGUSD' || p === 'SILVER') { // Silver - 5000 ounces per lot, pip 0.001 = $5
+                return 5000;
+            }
+            
+            // Crypto
+            if (p === 'BTCUSD' || p === 'BTCUSDT') {
+                return 1; // 1 lot = 1 BTC, P/L in USD per dollar move
+            }
+            if (p === 'ETHUSD' || p === 'ETHUSDT') {
+                return 1; // Simplified
+            }
+            
+            // Indices
+            if (['US30', 'DOW', 'DJI'].includes(p)) {
+                return 1; // $1 per point per lot (mini)
+            }
+            if (['SPX500', 'SPX', 'NAS100', 'NASDAQ'].includes(p)) {
+                return 1;
+            }
+            if (['GER40', 'DAX', 'UK100'].includes(p)) {
+                return 1;
+            }
+            
+            // Oil
+            if (p.includes('OIL') || p.includes('WTI') || p.includes('BRENT') || p === 'USOIL' || p === 'UKOIL') {
+                return 1000;
+            }
+            
+            // Default for other forex
+            return 100000;
+        }
+
+        function saveTrade(e) {
+            e.preventDefault();
+           
+            const pair = document.getElementById('trade-pair').value.toUpperCase().trim();
+            if (!pair) {
+                alert("Please enter instrument");
+                return;
+            }
+            
+            const direction = document.getElementById('trade-direction').value;
+            const entry = parseFloat(document.getElementById('entry-price').value);
+            const exit = parseFloat(document.getElementById('exit-price').value);
+            const lots = parseFloat(document.getElementById('lot-size').value) || 0.1;
+           
+            if (!entry || !exit) {
+                alert("Entry and Exit prices are required");
+                return;
+            }
+           
+            const priceDiff = direction === 'Buy' ? (exit - entry) : (entry - exit);
+            const multiplier = getPipMultiplier(pair);
+           
+            const reasonHTML = document.getElementById('trade-reason-editor').innerHTML;
+            const reasonText = document.getElementById('trade-reason-editor').innerText.trim();
+            
+            const newTrade = {
+                id: Date.now(),
+                date: document.getElementById('trade-date').value,
+                pair: pair,
+                direction: direction,
+                entry: entry,
+                exit: exit,
+                sl: parseFloat(document.getElementById('stop-loss').value) || null,
+                tp: parseFloat(document.getElementById('take-profit').value) || null,
+                lots: lots,
+                reason: reasonText,
+                reasonHTML: reasonHTML,
+                screenshots: [...currentScreenshots],
+                timestamp: new Date().toISOString(),
+                multiplier: multiplier
+            };
+           
+            newTrade.pl = priceDiff * lots * multiplier;
+           
+            const currentAcc = getCurrentAccount();
+            currentAcc.trades.unshift(newTrade);
+            saveCurrentAccountData();
+           
+            resetNewTradeForm();
+           
+            alert(`Trade saved successfully!\n\nInstrument: ${pair}\nP/L: $${newTrade.pl.toFixed(2)}`);
+            navigate(0);
+        }
+       
+        function cancelForm() {
+            if (confirm('Discard this trade?')) {
+                resetNewTradeForm();
+                navigate(0);
+            }
+        }
+       
+        function calculateCurrentBalance(account) {
+            const totalPL = account.trades.reduce((sum, t) => sum + (t.pl || 0), 0);
+            return account.startingBalance + totalPL;
+        }
+       
+        function calculateWinRate(account) {
+            const trades = account.trades;
+            if (trades.length === 0) return 0;
+            const wins = trades.filter(t => t.pl > 0).length;
+            return (wins / trades.length) * 100;
+        }
+       
+        function calculateAvgRR(account) {
+            const trades = account.trades;
+            let totalRR = 0;
+            let count = 0;
+           
+            trades.forEach(trade => {
+                if (trade.sl && trade.tp) {
+                    let risk, reward;
+                    if (trade.direction === 'Buy') {
+                        risk = trade.entry - trade.sl;
+                        reward = trade.tp - trade.entry;
+                    } else {
+                        risk = trade.sl - trade.entry;
+                        reward = trade.entry - trade.tp;
+                    }
+                    if (risk > 0) {
+                        totalRR += (reward / risk);
+                        count++;
+                    }
+                }
+            });
+            return { avg: count ? (totalRR / count) : 0, count: count };
+        }
+       
+        function getDailyPL(account) {
+            const daily = {};
+            account.trades.forEach(trade => {
+                if (!trade.date) return;
+                const d = new Date(trade.date);
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                if (!daily[key]) daily[key] = 0;
+                daily[key] += (trade.pl || 0);
+            });
+            return daily;
+        }
+       
+        function renderCalendar() {
+            const account = getCurrentAccount();
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+           
+            document.getElementById('calendar-month').textContent = 
+                currentCalendarDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+           
+            const dailyPL = getDailyPL(account);
+            const monthlyPL = Object.values(dailyPL).reduce((a, b) => a + b, 0);
+            const monthlyEl = document.getElementById('monthly-total');
+            monthlyEl.innerHTML = `
+                <span class="${monthlyPL >= 0 ? 'text-emerald-400' : 'text-red-400'} font-medium">
+                    Monthly P/L: ${monthlyPL >= 0 ? '+' : ''}$${monthlyPL.toFixed(2)}
+                </span>
+            `;
+           
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+           
+            let html = `<thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody>`;
+           
+            let day = 1;
+            let row = '<tr>';
+           
+            for (let i = 0; i < firstDay; i++) row += '<td></td>';
+           
+            for (let i = firstDay; i < 7 && day <= daysInMonth; i++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const pl = dailyPL[dateKey] || 0;
+                const isToday = (new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year);
+               
+                let cellClass = 'calendar-day';
+                if (isToday) cellClass += ' today';
+                if (pl !== 0) cellClass += ' has-trades';
+               
+                let plHTML = pl !== 0 ? `<div class="calendar-pl ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</div>` : '';
+               
+                row += `<td class="${cellClass}"><div class="calendar-day-number">${day}</div>${plHTML}</td>`;
+                day++;
+            }
+            row += '</tr>';
+            html += row;
+           
+            while (day <= daysInMonth) {
+                row = '<tr>';
+                for (let i = 0; i < 7; i++) {
+                    if (day > daysInMonth) {
+                        row += '<td></td>';
+                        continue;
+                    }
+                    const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                    const pl = dailyPL[dateKey] || 0;
+                    const isToday = (new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year);
+                   
+                    let cellClass = 'calendar-day';
+                    if (isToday) cellClass += ' today';
+                    if (pl !== 0) cellClass += ' has-trades';
+                   
+                    let plHTML = pl !== 0 ? `<div class="calendar-pl ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</div>` : '';
+                   
+                    row += `<td class="${cellClass}"><div class="calendar-day-number">${day}</div>${plHTML}</td>`;
+                    day++;
+                }
+                row += '</tr>';
+                html += row;
+            }
+           
+            html += '</tbody>';
+            document.getElementById('calendar-table').innerHTML = html;
+        }
+       
+        function prevMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        }
+       
+        function nextMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        }
+       
+        function renderDashboard() {
+            const account = getCurrentAccount();
+            const currentBalance = calculateCurrentBalance(account);
+            const totalPL = account.trades.reduce((sum, t) => sum + (t.pl || 0), 0);
+           
+            document.getElementById('account-balance').textContent = '$' + currentBalance.toFixed(2);
+            document.getElementById('header-balance').textContent = '$' + currentBalance.toFixed(2);
+            document.getElementById('header-account-name').textContent = account.name;
+           
+            const percentChange = account.startingBalance > 0 ? ((totalPL / account.startingBalance) * 100) : 0;
+            const changeEl = document.getElementById('balance-change');
+            changeEl.textContent = `${totalPL >= 0 ? '+' : ''}$${totalPL.toFixed(2)} (${percentChange.toFixed(2)}%)`;
+            changeEl.className = totalPL >= 0 ? "text-emerald-500 text-sm mt-2 flex items-center gap-1" : "text-red-500 text-sm mt-2 flex items-center gap-1";
+           
+            document.getElementById('starting-balance-display').textContent = '$' + account.startingBalance.toFixed(2);
+            document.getElementById('total-pl-display').textContent = (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(2);
+            document.getElementById('total-pl-display').className = totalPL >= 0 ? "font-medium text-emerald-500" : "font-medium text-red-500";
+           
+            document.getElementById('total-trades').textContent = account.trades.length;
+           
+            const winRate = calculateWinRate(account);
+            const trades = account.trades;
+            const wins = trades.filter(t => t.pl > 0).length;
+            const losses = trades.length - wins;
+           
+            document.getElementById('win-rate').textContent = winRate.toFixed(1) + '%';
+            document.getElementById('wins-display').textContent = wins + ' Wins';
+            document.getElementById('losses-count').textContent = losses + ' Losses';
+            document.getElementById('win-rate-bar').style.width = winRate + '%';
+           
+            const rrData = calculateAvgRR(account);
+            document.getElementById('avg-rr').textContent = rrData.avg > 0 ? `1:${rrData.avg.toFixed(2)}` : '—';
+            document.getElementById('rr-trades-info').textContent = `Based on ${rrData.count} trades with SL & TP`;
+           
+            const container = document.getElementById('recent-trades');
+            container.innerHTML = '';
+           
+            const recent = trades.slice(0, 3);
+           
+            if (recent.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-zinc-500">No trades yet. Log your first trade!</div>`;
+                renderCalendar();
+                return;
+            }
+           
+            recent.forEach(trade => {
+                const div = document.createElement('div');
+                div.className = 'bg-zinc-900 border border-zinc-800 rounded-3xl p-6 trade-card cursor-pointer';
+                div.onclick = () => showTradeDetail(trade);
+                div.innerHTML = `
+                    <div class="flex justify-between">
+                        <div>
+                            <span class="font-mono text-lg">${trade.pair}</span>
+                            <span class="ml-3 px-3 py-1 text-xs rounded-full ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
+                                ${trade.direction}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span class="${trade.pl >= 0 ? 'profit' : 'loss'} font-semibold">
+                                ${trade.pl >= 0 ? '+' : ''}$${trade.pl.toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-xs text-zinc-500">
+                        ${new Date(trade.date).toLocaleDateString('en-US', {month:'short', day:'numeric'})}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+           
+            renderCalendar();
+        }
+
+        // Enhanced Journal Functions
+        function renderJournal() {
+            const account = getCurrentAccount();
+            const tbody = document.getElementById('journal-table');
+            tbody.innerHTML = '';
+           
+            let filteredTrades = [...account.trades];
+            
+            if (currentFilter === 'profit') {
+                filteredTrades = filteredTrades.filter(t => t.pl > 0);
+            } else if (currentFilter === 'loss') {
+                filteredTrades = filteredTrades.filter(t => t.pl < 0);
+            }
+            
+            const query = document.getElementById('search-input').value.toLowerCase();
+            if (query) {
+                filteredTrades = filteredTrades.filter(t => 
+                    t.pair.toLowerCase().includes(query) || 
+                    (t.reason && t.reason.toLowerCase().includes(query))
+                );
+            }
+            
+            filteredTrades.sort((a, b) => {
+                let valA, valB;
+                switch(currentSort.column) {
+                    case 1: valA = new Date(a.date); valB = new Date(b.date); break;
+                    case 2: valA = a.pair; valB = b.pair; break;
+                    case 3: valA = a.direction; valB = b.direction; break;
+                    case 4: valA = new Date(a.date); valB = new Date(b.date); break;
+                    case 5: valA = a.pl || 0; valB = b.pl || 0; break;
+                    case 7: valA = a.lots || 0; valB = b.lots || 0; break;
+                    default: valA = new Date(a.date); valB = new Date(b.date);
+                }
+                
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            const totalPages = Math.ceil(filteredTrades.length / PAGE_SIZE) || 1;
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const paginatedTrades = filteredTrades.slice(start, start + PAGE_SIZE);
+            
+            let runningBalance = account.startingBalance;
+            
+            document.getElementById('page-info').textContent = 
+                `Showing ${start + 1}-${Math.min(start + PAGE_SIZE, filteredTrades.length)} of ${filteredTrades.length}`;
+            
+            document.getElementById('prev-page-btn').disabled = currentPage === 1;
+            document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+            
+            paginatedTrades.forEach((trade) => {
+                runningBalance += (trade.pl || 0);
+               
+                const row = document.createElement('tr');
+                row.className = 'trade-row border-b border-zinc-800 hover:bg-zinc-800/50 transition';
+                row.dataset.tradeId = trade.id;
+                
+                row.innerHTML = `
+                    <td class="py-5 px-6 whitespace-nowrap">${new Date(trade.date).toLocaleDateString()}</td>
+                    <td class="py-5 px-6 font-medium font-mono">${trade.pair}</td>
+                    <td class="py-5 px-6">
+                        <span class="px-4 py-1 text-xs rounded-2xl ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
+                            ${trade.direction}
+                        </span>
+                    </td>
+                    <td class="py-5 px-6 font-mono whitespace-nowrap">
+                        ${trade.entry} → ${trade.exit}
+                    </td>
+                    <td class="py-5 px-6 font-mono text-emerald-300">${trade.lots || '0.10'}</td>
+                    <td class="py-5 px-6 font-semibold ${trade.pl >= 0 ? 'profit' : 'loss'}">
+                        ${trade.pl >= 0 ? '+' : ''}$$${(trade.pl || 0).toFixed(2)}
+                    </td>
+                    <td class="py-5 px-6 font-mono whitespace-nowrap">
+                        $${runningBalance.toFixed(2)}
+                    </td>
+                    <td class="py-5 px-6">
+                        ${trade.screenshots && trade.screenshots.length > 0 ? 
+                            `<span onclick="event.stopImmediatePropagation(); viewScreenshots(${trade.id});" class="text-emerald-500 hover:underline cursor-pointer">${trade.screenshots.length} images</span>` :
+                            `<span class="text-zinc-600">None</span>`}
+                    </td>
+                    <td class="py-5 px-6">
+                        <div class="flex gap-2">
+                            <button onclick="event.stopImmediatePropagation(); showTradeDetailFromJournal(${trade.id});" 
+                                    class="text-emerald-400 hover:text-emerald-500 p-2">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="event.stopImmediatePropagation(); deleteTrade(${trade.id});" 
+                                    class="text-red-400 hover:text-red-500 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                row.onclick = (e) => {
+                    if (!e.target.closest('button')) {
+                        showTradeDetail(trade);
+                    }
+                };
+                tbody.appendChild(row);
+            });
+            
+            if (paginatedTrades.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-20 text-center text-zinc-500">
+                            No trades found. Try adjusting your filters.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function deleteTrade(id) {
+            if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+                const account = getCurrentAccount();
+                account.trades = account.trades.filter(t => t.id !== id);
+                saveCurrentAccountData();
+                renderJournal();
+                renderDashboard();
+                if (!document.getElementById('analytics-content').classList.contains('hidden')) {
+                    renderAnalytics();
+                }
+                alert('Trade deleted successfully.');
+            }
+        }
+
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'desc';
+            }
+            renderJournal();
+        }
+
+        function toggleFilter(el) {
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active', 'bg-emerald-500', 'text-black');
+            });
+            el.classList.add('active', 'bg-emerald-500', 'text-black');
+            currentFilter = el.dataset.filter;
+            currentPage = 1;
+            renderJournal();
+        }
+
+        function filterTrades() {
+            currentPage = 1;
+            renderJournal();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderJournal();
+            }
+        }
+
+        function nextPage() {
+            currentPage++;
+            renderJournal();
+        }
+
+        function showTradeDetailFromJournal(id) {
+            const account = getCurrentAccount();
+            const trade = account.trades.find(t => t.id === id);
+            if (trade) showTradeDetail(trade);
+        }
+       
+        function renderAnalytics() {
+            const account = getCurrentAccount();
+            const trades = account.trades;
+            if (!trades.length) {
+                document.getElementById('analytics-total-pl').textContent = '$0.00';
+                return;
+            }
+            
+            const totalPL = trades.reduce((sum, t) => sum + (t.pl || 0), 0);
+            const starting = account.startingBalance;
+            const pct = ((totalPL / starting) * 100).toFixed(2);
+            
+            document.getElementById('analytics-total-pl').textContent = (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(2);
+            document.getElementById('analytics-total-pl').className = totalPL >= 0 ? 'text-4xl font-bold mt-3 profit' : 'text-4xl font-bold mt-3 loss';
+            document.getElementById('analytics-total-pl-pct').textContent = (totalPL >= 0 ? '+' : '') + pct + '%';
+            document.getElementById('analytics-total-pl-pct').className = totalPL >= 0 ? 'text-xs mt-1 text-emerald-400' : 'text-xs mt-1 text-red-400';
+            
+            const winRate = calculateWinRate(account);
+            document.getElementById('analytics-winrate').textContent = winRate.toFixed(1) + '%';
+            
+            let grossProfit = 0, grossLoss = 0;
+            trades.forEach(t => {
+                if (t.pl > 0) grossProfit += t.pl;
+                else grossLoss += Math.abs(t.pl);
+            });
+            const profitFactor = grossLoss ? (grossProfit / grossLoss).toFixed(2) : '∞';
+            document.getElementById('analytics-profit-factor').textContent = profitFactor;
+            
+            const expectancy = trades.length ? totalPL / trades.length : 0;
+            document.getElementById('analytics-expectancy').textContent = (expectancy >= 0 ? '+' : '') + '$' + expectancy.toFixed(2);
+            
+            // Enhanced Equity Curve
+            const ctxEquity = document.getElementById('equityChart');
+            if (equityChartInstance) equityChartInstance.destroy();
+           
+            let equityData = [starting];
+            let dates = ['Start'];
+            let currentEq = starting;
+            const sorted = [...trades].sort((a,b) => new Date(a.date) - new Date(b.date));
+           
+            sorted.forEach(t => {
+                currentEq += t.pl || 0;
+                equityData.push(currentEq);
+                dates.push(new Date(t.date).toLocaleDateString('short'));
+            });
+           
+            equityChartInstance = new Chart(ctxEquity, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Account Equity',
+                        data: equityData,
+                        borderColor: '#00ff9d',
+                        borderWidth: 3.5,
+                        tension: 0.35,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#00ff9d',
+                        fill: true,
+                        backgroundColor: 'rgba(0, 255, 157, 0.12)'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#18181b',
+                            titleColor: '#a1a1aa',
+                            bodyColor: '#00ff9d',
+                            displayColors: false,
+                            callbacks: {
+                                label: (ctx) => '$' + ctx.raw.toFixed(2)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            grid: { color: '#27272a' }, 
+                            ticks: { color: '#a1a1aa', font: { size: 11 } },
+                            border: { dash: [2, 2] }
+                        },
+                        x: { 
+                            grid: { color: '#27272a' }, 
+                            ticks: { color: '#a1a1aa', font: { size: 11 }, maxRotation: 45 }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round'
+                        }
+                    }
+                }
+            });
+           
+            // Enhanced Monthly Performance
+            const monthlyPLMap = {};
+            sorted.forEach(t => {
+                const m = new Date(t.date).toISOString().slice(0,7);
+                monthlyPLMap[m] = (monthlyPLMap[m] || 0) + (t.pl || 0);
+            });
+           
+            const monthlyLabels = Object.keys(monthlyPLMap);
+            const monthlyValues = Object.values(monthlyPLMap);
+           
+            const ctxMonthly = document.getElementById('monthlyChart');
+            if (monthlyChartInstance) monthlyChartInstance.destroy();
+           
+            const viewType = document.getElementById('monthly-view-select').value;
+           
+            monthlyChartInstance = new Chart(ctxMonthly, {
+                type: viewType === 'line' ? 'line' : 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Monthly P/L',
+                        data: monthlyValues,
+                        borderColor: '#00ff9d',
+                        backgroundColor: monthlyValues.map(v => v >= 0 ? 'rgba(0, 255, 157, 0.7)' : 'rgba(239, 68, 68, 0.7)'),
+                        borderWidth: viewType === 'line' ? 3 : 0,
+                        tension: 0.3,
+                        borderRadius: 6
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => '$' + ctx.raw.toFixed(2)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            grid: { color: '#27272a' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        x: { 
+                            grid: { color: '#27272a' },
+                            ticks: { color: '#a1a1aa' }
+                        }
+                    }
+                }
+            });
+           
+            // Pie Chart
+            const pairCount = {};
+            trades.forEach(trade => {
+                pairCount[trade.pair] = (pairCount[trade.pair] || 0) + 1;
+            });
+           
+            const sortedPairs = Object.entries(pairCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const labels = sortedPairs.map(p => p[0]);
+            const data = sortedPairs.map(p => p[1]);
+           
+            const ctxPie = document.getElementById('pairPieChart');
+            if (pieChartInstance) pieChartInstance.destroy();
+           
+            pieChartInstance = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: labels.length ? labels : ['No Data'],
+                    datasets: [{
+                        data: data.length ? data : [1],
+                        backgroundColor: ['#22d3ee', '#a5b4fc', '#34d399', '#f472b6', '#fbbf24', '#60a5fa', '#c084fc', '#f87171'],
+                        borderColor: '#18181b',
+                        borderWidth: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#d1d5db', padding: 18, font: { size: 13 } } 
+                        }
+                    }
+                }
+            });
+           
+            // Pair performance table
+            const tbody = document.getElementById('pair-tbody');
+            tbody.innerHTML = '';
+           
+            const pairStats = {};
+            trades.forEach(t => {
+                if (!pairStats[t.pair]) {
+                    pairStats[t.pair] = { trades: 0, wins: 0, pl: 0 };
+                }
+                pairStats[t.pair].trades++;
+                if (t.pl > 0) pairStats[t.pair].wins++;
+                pairStats[t.pair].pl += t.pl || 0;
+            });
+           
+            Object.entries(pairStats).sort((a,b) => b[1].pl - a[1].pl).forEach(([pair, stats]) => {
+                const winPct = (stats.wins / stats.trades * 100).toFixed(1);
+                const avgPL = (stats.pl / stats.trades).toFixed(2);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-zinc-800 hover:bg-zinc-800/50';
+                row.innerHTML = `
+                    <td class="py-4 font-medium">${pair}</td>
+                    <td class="py-4 text-right">${stats.trades}</td>
+                    <td class="py-4 text-right">${winPct}%</td>
+                    <td class="py-4 text-right font-mono">$${avgPL}</td>
+                    <td class="py-4 text-right font-semibold ${stats.pl >= 0 ? 'profit' : 'loss'}">$${(stats.pl).toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+       
+        function showTradeDetail(trade) {
+            const modal = document.getElementById('trade-modal');
+            const content = document.getElementById('modal-content');
+           
+            let screenshotsHTML = '';
+            if (trade.screenshots && trade.screenshots.length > 0) {
+                screenshotsHTML = `
+                    <div class="mt-10">
+                        <div class="text-zinc-400 text-sm mb-3">Screenshots (${trade.screenshots.length})</div>
+                        <div class="screenshot-grid">
+                            ${trade.screenshots.map(src => `
+                                <div class="screenshot-thumb">
+                                    <img src="${src}" class="rounded-2xl" onclick="showLightbox('${src}')" alt="Trade chart">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+           
+            const notesHTML = trade.reasonHTML 
+                ? `<div class="notes-content bg-zinc-800 rounded-3xl p-6">${trade.reasonHTML}</div>` 
+                : (trade.reason ? `<div class="notes-content bg-zinc-800 rounded-3xl p-6">${renderMarkdown(trade.reason)}</div>` : '');
+           
+            let html = `
+                <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-3xl">${trade.pair}</span>
+                            <span class="px-5 py-2 text-sm rounded-3xl ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
+                                ${trade.direction.toUpperCase()}
+                            </span>
+                        </div>
+                        <p class="text-zinc-500 mt-1">${new Date(trade.date).toLocaleString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-4xl font-bold ${trade.pl >= 0 ? 'profit' : 'loss'}">
+                            ${trade.pl >= 0 ? '+' : ''}$$${(trade.pl || 0).toFixed(2)}
+                        </div>
+                        <div class="text-xs text-zinc-500">P/L</div>
+                    </div>
+                </div>
+               
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-zinc-400 text-sm">Entry Price</div>
+                            <div class="text-2xl font-mono">${trade.entry}</div>
+                        </div>
+                        <div>
+                            <div class="text-zinc-400 text-sm">Exit Price</div>
+                            <div class="text-2xl font-mono">${trade.exit}</div>
+                        </div>
+                        <div>
+                            <div class="text-zinc-400 text-sm">Lot Size</div>
+                            <div class="text-2xl font-mono">${trade.lots || '0.10'}</div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-zinc-400 text-sm">Stop Loss</div>
+                            <div class="text-2xl font-mono">${trade.sl || '—'}</div>
+                        </div>
+                        <div>
+                            <div class="text-zinc-400 text-sm">Take Profit</div>
+                            <div class="text-2xl font-mono">${trade.tp || '—'}</div>
+                        </div>
+                    </div>
+                </div>
+               
+                ${trade.reason || trade.reasonHTML ? `
+                <div class="mt-10">
+                    <div class="text-zinc-400 text-sm mb-3 flex items-center gap-2">
+                        <i class="fas fa-notebook"></i>
+                        <span>Trade Reason / Setup Notebook</span>
+                    </div>
+                    ${notesHTML}
+                </div>` : ''}
+               
+                ${screenshotsHTML}
+            `;
+           
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+       
+        function viewScreenshots(tradeId) {
+            const account = getCurrentAccount();
+            const trade = account.trades.find(t => t.id === tradeId);
+            if (!trade || !trade.screenshots || trade.screenshots.length === 0) return;
+           
+            const modal = document.getElementById('trade-modal');
+            const content = document.getElementById('modal-content');
+           
+            let html = `
+                <div class="bg-zinc-950 p-4 rounded-3xl border border-zinc-700">
+                    <div class="screenshot-grid">
+                        ${trade.screenshots.map(src => `
+                            <img src="${src}" class="rounded-2xl w-full cursor-pointer" onclick="showLightbox('${src}')" alt="Trade chart">
+                        `).join('')}
+                    </div>
+                </div>`;
+           
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+       
+        function closeModal() {
+            document.getElementById('trade-modal').classList.add('hidden');
+        }
+       
+        function showNewTradeModal() {
+            navigate(1);
+        }
+       
+        function showAccountsModal() {
+            renderAccountsList();
+            document.getElementById('accounts-modal').classList.remove('hidden');
+        }
+        
+        function closeAccountsModal() {
+            document.getElementById('accounts-modal').classList.add('hidden');
+        }
+        
+        function renderAccountsList() {
+            const container = document.getElementById('accounts-list');
+            container.innerHTML = '';
+            
+            accounts.forEach((acc, index) => {
+                const isCurrent = acc.id === currentAccountId;
+                const balance = calculateCurrentBalance(acc);
+                
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 rounded-2xl border ${isCurrent ? 'border-emerald-500 bg-zinc-800' : 'border-zinc-700 hover:bg-zinc-800'} cursor-pointer`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium">${acc.name}</div>
+                            <div class="text-emerald-400 font-mono text-sm">$${balance.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    ${isCurrent ? `<span class="text-xs bg-emerald-500 text-black px-3 py-1 rounded-full">Current</span>` : ''}
+                `;
+                div.onclick = () => {
+                    setCurrentAccount(acc.id);
+                    closeAccountsModal();
+                    renderDashboard();
+                    if (!document.getElementById('journal-content').classList.contains('hidden')) renderJournal();
+                    if (!document.getElementById('analytics-content').classList.contains('hidden')) renderAnalytics();
+                };
+                container.appendChild(div);
+            });
+        }
+        
+        function addNewAccount() {
+            const nameInput = document.getElementById('new-account-name');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert("Please enter an account name");
+                return;
+            }
+            
+            const newAcc = {
+                id: 'acc_' + Date.now(),
+                name: name,
+                startingBalance: 10000,
+                trades: []
+            };
+            
+            accounts.push(newAcc);
+            saveCurrentAccountData();
+            nameInput.value = '';
+            
+            renderAccountsList();
+            alert(`Account "${name}" created successfully!`);
+        }
+        
+        function showAccountSelector() {
+            showAccountsModal();
+        }
+
+        function exportJournal() {
+            const account = getCurrentAccount();
+            const trades = account.trades;
+            if (trades.length === 0) {
+                alert("No trades to export!");
+                return;
+            }
+           
+            let csv = "Date,Pair,Direction,Entry,Exit,Lots,P/L,SL,TP,Reason,Screenshots\n";
+            trades.forEach(t => {
+                const screenshotCount = t.screenshots ? t.screenshots.length : 0;
+                csv += `"${t.date}","${t.pair}","${t.direction}",${t.entry},${t.exit},${t.lots || 0},${t.pl || 0},${t.sl || ''},${t.tp || ''},"${(t.reason || '').replace(/"/g, '""')}",${screenshotCount}\n`;
+            });
+           
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `XAffordsFX_Journal_${account.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        function updatePLPreview() {
+            const direction = document.getElementById('trade-direction').value;
+            const entry = parseFloat(document.getElementById('entry-price').value);
+            const exit = parseFloat(document.getElementById('exit-price').value);
+            const lots = parseFloat(document.getElementById('lot-size').value) || 0.1;
+            const pair = document.getElementById('trade-pair').value.toUpperCase().trim();
+
+            const previewEl = document.getElementById('pl-preview');
+            const previewPL = document.getElementById('preview-pl');
+
+            if (!entry || !exit || !pair) {
+                previewEl.classList.add('hidden');
+                return;
+            }
+
+            const priceDiff = direction === 'Buy' ? (exit - entry) : (entry - exit);
+            const multiplier = getPipMultiplier(pair);
+            const pl = priceDiff * lots * multiplier;
+
+            previewPL.textContent = `${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}`;
+            previewPL.className = `text-2xl font-bold ${pl >= 0 ? 'profit' : 'loss'}`;
+            previewEl.classList.remove('hidden');
+        }
+
+        function formatText(type) {
+            const editor = document.getElementById('trade-reason-editor');
+            editor.focus();
+            
+            if (type === 'bold') {
+                document.execCommand('bold');
+            } else if (type === 'italic') {
+                document.execCommand('italic');
+            }
+        }
+
+        // Adjust Balance Functions
+        let currentAdjustAccount = null;
+
+        function showAdjustBalanceModal() {
+            const account = getCurrentAccount();
+            currentAdjustAccount = account;
+            
+            document.getElementById('current-balance-display').textContent = '$' + calculateCurrentBalance(account).toFixed(2);
+            document.getElementById('new-balance-input').value = calculateCurrentBalance(account).toFixed(2);
+            
+            document.getElementById('adjust-balance-modal').classList.remove('hidden');
+        }
+
+        function closeAdjustBalanceModal() {
+            document.getElementById('adjust-balance-modal').classList.add('hidden');
+            currentAdjustAccount = null;
+        }
+
+        function quickAdjust(amount) {
+            const input = document.getElementById('new-balance-input');
+            let currentVal = parseFloat(input.value) || 0;
+            input.value = (currentVal + amount).toFixed(2);
+        }
+
+        function applyBalanceAdjustment() {
+            if (!currentAdjustAccount) return;
+            
+            const newBalance = parseFloat(document.getElementById('new-balance-input').value);
+            if (isNaN(newBalance) || newBalance < 0) {
+                alert("Please enter a valid balance");
+                return;
+            }
+            
+            const currentBalance = calculateCurrentBalance(currentAdjustAccount);
+            const totalPL = currentAdjustAccount.trades.reduce((sum, t) => sum + (t.pl || 0), 0);
+            
+            // Adjust starting balance to achieve desired total balance
+            currentAdjustAccount.startingBalance = newBalance - totalPL;
+            
+            saveCurrentAccountData();
+            closeAdjustBalanceModal();
+            
+            renderDashboard();
+            if (!document.getElementById('journal-content').classList.contains('hidden')) renderJournal();
+            if (!document.getElementById('analytics-content').classList.contains('hidden')) renderAnalytics();
+            
+            alert(`Balance updated successfully! New balance: $${newBalance.toFixed(2)}`);
+        }
+
+        // Initialize
+        window.onload = function() {
+            const savedUser = localStorage.getItem('xaffordsfx_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadAccountData();
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('current-username').textContent = currentUser.username;
+                navigate(0);
+            } else {
+                document.getElementById('auth-container').classList.remove('hidden');
+                showLogin();
+            }
+            
+            console.log('%cXAffordsFX Professional Trading Journal v2.1 - Enhanced Pips', 'color:#00ff9d; font-weight:bold; font-size:14px');
+        };
+
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = e.target.closest('button[onclick="toggleMobileMenu()"]');
+            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !hamburger) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
