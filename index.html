@@ -655,6 +655,16 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <!-- Weekly P/L -->
+                        <div id="weekly-pl-summary" class="mb-6 p-4 bg-zinc-950 border border-zinc-700 rounded-2xl flex justify-between items-center text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="text-zinc-400">This Week P/L:</span>
+                                <span id="weekly-pl" class="font-semibold"></span>
+                            </div>
+                            <div class="text-xs text-zinc-500">Current balance updated across all views</div>
+                        </div>
+                        
                         <div class="overflow-x-auto">
                             <table id="calendar-table" class="calendar-table text-xs min-w-full"></table>
                         </div>
@@ -1493,35 +1503,30 @@
             if (!pair) return 100000;
             const p = pair.toUpperCase().trim();
             
-            // Major Forex Pairs (pip = 0.0001)
             if (['EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'EURGBP', 'EURJPY', 'GBPJPY', 'AUDJPY'].includes(p)) {
-                return 100000; // 1 standard lot = 10 USD per pip
+                return 100000;
             }
             
-            // JPY Pairs (pip = 0.01)
             if (p.endsWith('JPY')) {
                 return 1000;
             }
             
-            // Metals
-            if (p === 'XAUUSD' || p === 'GOLD') { // Gold - 100 ounces per lot, pip 0.01 = $1
+            if (p === 'XAUUSD' || p === 'GOLD') {
                 return 100;
             }
-            if (p === 'XAGUSD' || p === 'SILVER') { // Silver - 5000 ounces per lot, pip 0.001 = $5
+            if (p === 'XAGUSD' || p === 'SILVER') {
                 return 5000;
             }
             
-            // Crypto
             if (p === 'BTCUSD' || p === 'BTCUSDT') {
-                return 1; // 1 lot = 1 BTC, P/L in USD per dollar move
+                return 1;
             }
             if (p === 'ETHUSD' || p === 'ETHUSDT') {
-                return 1; // Simplified
+                return 1;
             }
             
-            // Indices
             if (['US30', 'DOW', 'DJI'].includes(p)) {
-                return 1; // $1 per point per lot (mini)
+                return 1;
             }
             if (['SPX500', 'SPX', 'NAS100', 'NASDAQ'].includes(p)) {
                 return 1;
@@ -1530,12 +1535,10 @@
                 return 1;
             }
             
-            // Oil
             if (p.includes('OIL') || p.includes('WTI') || p.includes('BRENT') || p === 'USOIL' || p === 'UKOIL') {
                 return 1000;
             }
             
-            // Default for other forex
             return 100000;
         }
 
@@ -1647,7 +1650,27 @@
             });
             return daily;
         }
-       
+
+        // NEW: Weekly P/L calculation
+        function getWeeklyPL(account) {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday start
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            let weeklyPL = 0;
+            
+            account.trades.forEach(trade => {
+                if (!trade.date) return;
+                const tradeDate = new Date(trade.date);
+                if (tradeDate >= startOfWeek) {
+                    weeklyPL += (trade.pl || 0);
+                }
+            });
+            
+            return weeklyPL;
+        }
+
         function renderCalendar() {
             const account = getCurrentAccount();
             const year = currentCalendarDate.getFullYear();
@@ -1664,6 +1687,12 @@
                     Monthly P/L: ${monthlyPL >= 0 ? '+' : ''}$${monthlyPL.toFixed(2)}
                 </span>
             `;
+            
+            // Weekly PL
+            const weeklyPL = getWeeklyPL(account);
+            const weeklyEl = document.getElementById('weekly-pl');
+            weeklyEl.textContent = `${weeklyPL >= 0 ? '+' : ''}$${weeklyPL.toFixed(2)}`;
+            weeklyEl.className = weeklyPL >= 0 ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold';
            
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1803,7 +1832,7 @@
             renderCalendar();
         }
 
-        // Enhanced Journal Functions
+        // Enhanced Journal with proper running balance (full chronological)
         function renderJournal() {
             const account = getCurrentAccount();
             const tbody = document.getElementById('journal-table');
@@ -1825,28 +1854,22 @@
                 );
             }
             
-            filteredTrades.sort((a, b) => {
-                let valA, valB;
-                switch(currentSort.column) {
-                    case 1: valA = new Date(a.date); valB = new Date(b.date); break;
-                    case 2: valA = a.pair; valB = b.pair; break;
-                    case 3: valA = a.direction; valB = b.direction; break;
-                    case 4: valA = new Date(a.date); valB = new Date(b.date); break;
-                    case 5: valA = a.pl || 0; valB = b.pl || 0; break;
-                    case 7: valA = a.lots || 0; valB = b.lots || 0; break;
-                    default: valA = new Date(a.date); valB = new Date(b.date);
-                }
-                
-                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
+            // Sort for display (newest first by default)
+            filteredTrades.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             const totalPages = Math.ceil(filteredTrades.length / PAGE_SIZE) || 1;
             const start = (currentPage - 1) * PAGE_SIZE;
             const paginatedTrades = filteredTrades.slice(start, start + PAGE_SIZE);
             
-            let runningBalance = account.startingBalance;
+            // For accurate running balance: compute cumulative from ALL trades chronologically
+            const allTradesSorted = [...account.trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let globalRunning = account.startingBalance;
+            const tradeBalanceMap = new Map();
+            
+            allTradesSorted.forEach(t => {
+                globalRunning += (t.pl || 0);
+                tradeBalanceMap.set(t.id, globalRunning);
+            });
             
             document.getElementById('page-info').textContent = 
                 `Showing ${start + 1}-${Math.min(start + PAGE_SIZE, filteredTrades.length)} of ${filteredTrades.length}`;
@@ -1855,7 +1878,7 @@
             document.getElementById('next-page-btn').disabled = currentPage === totalPages;
             
             paginatedTrades.forEach((trade) => {
-                runningBalance += (trade.pl || 0);
+                const runningBalance = tradeBalanceMap.get(trade.id) || account.startingBalance + (trade.pl || 0);
                
                 const row = document.createElement('tr');
                 row.className = 'trade-row border-b border-zinc-800 hover:bg-zinc-800/50 transition';
@@ -2471,7 +2494,6 @@
             const currentBalance = calculateCurrentBalance(currentAdjustAccount);
             const totalPL = currentAdjustAccount.trades.reduce((sum, t) => sum + (t.pl || 0), 0);
             
-            // Adjust starting balance to achieve desired total balance
             currentAdjustAccount.startingBalance = newBalance - totalPL;
             
             saveCurrentAccountData();
@@ -2499,7 +2521,7 @@
                 showLogin();
             }
             
-            console.log('%cXAffordsFX Professional Trading Journal v2.1 - Enhanced Pips', 'color:#00ff9d; font-weight:bold; font-size:14px');
+            console.log('%cXAffordsFX Professional Trading Journal v2.2 - Enhanced Balance & Weekly', 'color:#00ff9d; font-weight:bold; font-size:14px');
         };
 
         document.addEventListener('click', function(e) {
