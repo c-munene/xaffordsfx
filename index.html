@@ -652,33 +652,134 @@
             border-radius: 12px;
         }
 
+        /* ========== JOURNAL HISTORY - PREMIUM ========== */
+        .journal-header {
+            background: linear-gradient(145deg, #18181b, #1f1f23);
+            border: 1px solid #27272a;
+            border-radius: 20px;
+            padding: 20px 24px;
+        }
+
+        .journal-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .journal-stat-card {
+            background: #141416;
+            border: 1px solid #2e2e33;
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .journal-stat-card .stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #71717a;
+        }
+
+        .journal-stat-card .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .journal-filters-panel {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 18px;
+            padding: 16px 20px;
+        }
+
+        .filter-chip {
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .filter-chip.active {
+            background: rgba(0, 255, 157, 0.15) !important;
+            border-color: #00ff9d !important;
+            color: #00ff9d !important;
+        }
+
         .journal-table th {
             position: relative;
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;
         }
         .journal-table th:hover {
             color: #00ff9d;
         }
         .journal-table th.sort-asc::after {
-            content: '↑';
-            position: absolute;
-            right: 8px;
+            content: ' ↑';
+            color: #00ff9d;
+            font-size: 0.75rem;
         }
         .journal-table th.sort-desc::after {
-            content: '↓';
-            position: absolute;
-            right: 8px;
+            content: ' ↓';
+            color: #00ff9d;
+            font-size: 0.75rem;
         }
+
         .trade-row {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
         }
         .trade-row:hover {
-            background-color: #27272a !important;
-            transform: scale(1.01);
+            background-color: #1f1f23 !important;
         }
-        .filter-chip {
-            transition: all 0.2s;
+
+        .dir-badge-long {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.35);
+        }
+        .dir-badge-short {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.35);
+        }
+
+        .result-win {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .result-loss {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        .result-be {
+            background: rgba(113, 113, 122, 0.15);
+            color: #a1a1aa;
+            border: 1px solid rgba(113, 113, 122, 0.3);
+        }
+
+        /* Mobile trade cards */
+        .journal-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .journal-card:hover {
+            border-color: #3f3f46;
+            background: #1c1c20;
+        }
+        .journal-card.long-accent {
+            border-left: 3px solid #34d399;
+        }
+        .journal-card.short-accent {
+            border-left: 3px solid #f87171;
         }
 
         .input-focus {
@@ -860,6 +961,11 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Date inputs styling */
+        input[type="date"], input[type="datetime-local"] {
+            color-scheme: dark;
         }
     </style>
 </head>
@@ -1100,7 +1206,7 @@
                             <p class="text-zinc-400 text-xs mt-5" id="rr-trades-info">Based on trades with SL &amp; TP</p>
                         </div>
                        
-                        <!-- Direction Breakdown: Long Wins / Long Losses / Short Wins / Short Losses -->
+                        <!-- Direction Breakdown -->
                         <div class="lg:col-span-2 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-5 border border-zinc-700">
                             <p class="text-zinc-400 text-sm mb-4">Direction Breakdown</p>
                             <div class="grid grid-cols-2 gap-3">
@@ -1160,7 +1266,6 @@
                             </div>
                         </div>
 
-                        <!-- Monthly Summary -->
                         <div class="monthly-summary-row" id="monthly-summary-row">
                             <div class="monthly-stat-pill">
                                 <span class="label">Monthly P/L</span>
@@ -1184,14 +1289,10 @@
                             </div>
                         </div>
 
-                        <!-- Weekly P/L horizontal scroll -->
                         <div class="weekly-scroll-container">
-                            <div class="weekly-pl-list" id="weekly-pl-list">
-                                <!-- Populated by JS -->
-                            </div>
+                            <div class="weekly-pl-list" id="weekly-pl-list"></div>
                         </div>
 
-                        <!-- Quick Filters -->
                         <div class="calendar-filters" id="calendar-filters">
                             <div class="cal-filter-chip active" data-cal-filter="all" onclick="setCalendarFilter(this)">All</div>
                             <div class="cal-filter-chip" data-cal-filter="longs" onclick="setCalendarFilter(this)">Longs</div>
@@ -1201,11 +1302,8 @@
                             <div class="cal-filter-chip" data-cal-filter="notrade" onclick="setCalendarFilter(this)">No-Trade Days</div>
                         </div>
 
-                        <!-- Calendar Grid -->
                         <div class="calendar-grid-wrapper">
-                            <div id="calendar-grid" class="calendar-grid">
-                                <!-- Populated by JS -->
-                            </div>
+                            <div id="calendar-grid" class="calendar-grid"></div>
                         </div>
                     </div>
                    
@@ -1218,9 +1316,7 @@
                             </a>
                         </div>
                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recent-trades">
-                            <!-- Populated by JS -->
-                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recent-trades"></div>
                     </div>
                 </div>
                
@@ -1238,8 +1334,16 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-zinc-400 text-sm mb-2">Date &amp; Time</label>
-                                    <input type="datetime-local" id="trade-date" 
-                                           class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                    <div class="flex gap-2">
+                                        <input type="datetime-local" id="trade-date" 
+                                               class="flex-1 bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus" required>
+                                        <button type="button" onclick="setTradeDateToNow()" 
+                                                class="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-emerald-500 rounded-2xl text-sm text-emerald-400 font-medium transition whitespace-nowrap"
+                                                title="Set to current time">
+                                            <i class="fas fa-clock"></i> Now
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-zinc-500 mt-1.5">Auto-filled with current local time. Click "Now" to refresh.</p>
                                 </div>
                                 <div>
                                     <label class="block text-zinc-400 text-sm mb-2">Instrument</label>
@@ -1260,8 +1364,8 @@
                                     <label class="block text-zinc-400 text-sm mb-2">Direction</label>
                                     <select id="trade-direction" onchange="updatePLPreview()" 
                                             class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
-                                        <option value="Buy">Buy</option>
-                                        <option value="Sell">Sell</option>
+                                        <option value="Buy">Long (Buy)</option>
+                                        <option value="Sell">Short (Sell)</option>
                                     </select>
                                 </div>
                                 <div>
@@ -1501,55 +1605,122 @@
                     </div>
                 </div>
                
-                <!-- Journal Content -->
+                <!-- ========== JOURNAL HISTORY - OPTIMIZED ========== -->
                 <div id="journal-content" class="hidden">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
-                        <div class="flex flex-wrap gap-3 items-center">
-                            <div class="relative flex-1 min-w-[240px]">
+                    <!-- Stats Summary Bar -->
+                    <div class="journal-header mb-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                            <div>
+                                <h2 class="text-xl font-bold tracking-tight">Trade History</h2>
+                                <p class="text-sm text-zinc-500 mt-0.5">All trades for the selected account</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="exportJournal()"
+                                        class="px-4 py-2.5 border border-zinc-700 rounded-xl hover:bg-zinc-800 flex items-center gap-2 text-sm font-medium transition">
+                                    <i class="fas fa-download text-emerald-400"></i>
+                                    Export CSV
+                                </button>
+                            </div>
+                        </div>
+                        <div class="journal-stats-bar" id="journal-stats-bar">
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Filtered Trades</span>
+                                <span class="stat-value text-zinc-100" id="js-count">0</span>
+                            </div>
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Net P/L</span>
+                                <span class="stat-value" id="js-pl">$0.00</span>
+                            </div>
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Win Rate</span>
+                                <span class="stat-value text-zinc-100" id="js-winrate">0%</span>
+                            </div>
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Wins / Losses</span>
+                                <span class="stat-value text-zinc-100" id="js-wl">0 / 0</span>
+                            </div>
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Avg P/L</span>
+                                <span class="stat-value" id="js-avg">$0.00</span>
+                            </div>
+                            <div class="journal-stat-card">
+                                <span class="stat-label">Longs / Shorts</span>
+                                <span class="stat-value text-zinc-100" id="js-dir">0 / 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters Panel -->
+                    <div class="journal-filters-panel mb-6">
+                        <div class="flex flex-col lg:flex-row gap-4">
+                            <!-- Search -->
+                            <div class="relative flex-1 min-w-[200px]">
                                 <input type="text" id="search-input"
-                                       onkeyup="filterTrades()"
-                                       placeholder="Search pairs..."
-                                       class="bg-zinc-900 border border-zinc-700 rounded-3xl px-6 py-4 w-full focus:outline-none focus:border-emerald-500 input-focus">
-                                <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                                       oninput="applyJournalFilters()"
+                                       placeholder="Search pair, notes, outcome..."
+                                       class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-emerald-500 input-focus text-sm">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
                             </div>
-                            
-                            <div onclick="toggleFilter(this)" data-filter="all" class="filter-chip active px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
-                                <i class="fas fa-list"></i>
-                                <span>All</span>
-                            </div>
-                            <div onclick="toggleFilter(this)" data-filter="profit" class="filter-chip px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
-                                <i class="fas fa-arrow-trend-up text-emerald-400"></i>
-                                <span>Profits</span>
-                            </div>
-                            <div onclick="toggleFilter(this)" data-filter="loss" class="filter-chip px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
-                                <i class="fas fa-arrow-trend-down text-red-400"></i>
-                                <span>Losses</span>
+
+                            <!-- Date Range -->
+                            <div class="flex items-center gap-2">
+                                <input type="date" id="filter-date-from" onchange="applyJournalFilters()"
+                                       class="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500 input-focus">
+                                <span class="text-zinc-500 text-xs">to</span>
+                                <input type="date" id="filter-date-to" onchange="applyJournalFilters()"
+                                       class="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500 input-focus">
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <button onclick="exportJournal()"
-                                    class="px-5 py-3 border border-zinc-700 rounded-2xl hover:bg-zinc-800 flex items-center gap-2 whitespace-nowrap">
-                                <i class="fas fa-download"></i>
-                                Export CSV
+                        <!-- Filter Chips Row -->
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <!-- Result -->
+                            <div class="flex items-center gap-1.5 mr-2">
+                                <span class="text-xs text-zinc-500 font-medium uppercase tracking-wide">Result</span>
+                                <button onclick="setJournalFilter('result', 'all', this)" data-group="result" data-value="all" class="filter-chip active px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">All</button>
+                                <button onclick="setJournalFilter('result', 'win', this)" data-group="result" data-value="win" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Wins</button>
+                                <button onclick="setJournalFilter('result', 'loss', this)" data-group="result" data-value="loss" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Losses</button>
+                            </div>
+
+                            <!-- Direction -->
+                            <div class="flex items-center gap-1.5 mr-2">
+                                <span class="text-xs text-zinc-500 font-medium uppercase tracking-wide">Dir</span>
+                                <button onclick="setJournalFilter('direction', 'all', this)" data-group="direction" data-value="all" class="filter-chip active px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">All</button>
+                                <button onclick="setJournalFilter('direction', 'Buy', this)" data-group="direction" data-value="Buy" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Long</button>
+                                <button onclick="setJournalFilter('direction', 'Sell', this)" data-group="direction" data-value="Sell" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Short</button>
+                            </div>
+
+                            <!-- Profitability quick -->
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs text-zinc-500 font-medium uppercase tracking-wide">P/L</span>
+                                <button onclick="setJournalFilter('pl', 'all', this)" data-group="pl" data-value="all" class="filter-chip active px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">All</button>
+                                <button onclick="setJournalFilter('pl', 'profit', this)" data-group="pl" data-value="profit" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Profit</button>
+                                <button onclick="setJournalFilter('pl', 'loss', this)" data-group="pl" data-value="loss" class="filter-chip px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full text-xs font-medium">Loss</button>
+                            </div>
+
+                            <button onclick="clearAllJournalFilters()" class="ml-auto px-3 py-1.5 text-xs text-zinc-400 hover:text-emerald-400 font-medium transition">
+                                <i class="fas fa-times mr-1"></i> Clear filters
                             </button>
                         </div>
                     </div>
                    
-                    <div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800">
+                    <!-- Desktop Table -->
+                    <div class="hidden lg:block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800">
                         <div class="table-container">
-                            <table class="w-full journal-table min-w-[800px]" id="journal-table-wrapper">
+                            <table class="w-full journal-table min-w-[1100px]" id="journal-table-wrapper">
                                 <thead>
-                                    <tr class="border-b border-zinc-800 bg-zinc-950">
-                                        <th onclick="sortTable(1)" class="text-left py-5 px-6 font-medium text-zinc-400">Date</th>
-                                        <th onclick="sortTable(2)" class="text-left py-5 px-6 font-medium text-zinc-400">Pair</th>
-                                        <th onclick="sortTable(3)" class="text-left py-5 px-6 font-medium text-zinc-400">Direction</th>
-                                        <th onclick="sortTable(4)" class="text-left py-5 px-6 font-medium text-zinc-400">Entry / Exit</th>
-                                        <th onclick="sortTable(7)" class="text-left py-5 px-6 font-medium text-zinc-400">Lots</th>
-                                        <th onclick="sortTable(5)" class="text-left py-5 px-6 font-medium text-zinc-400">P/L</th>
-                                        <th onclick="sortTable(6)" class="text-left py-5 px-6 font-medium text-zinc-400">Balance</th>
-                                        <th class="text-left py-5 px-6 font-medium text-zinc-400">Screenshots</th>
-                                        <th class="w-24 py-5 px-6"></th>
+                                    <tr class="border-b border-zinc-800 bg-zinc-950/80">
+                                        <th onclick="sortJournal('date')" class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider" data-sort="date">Date</th>
+                                        <th onclick="sortJournal('pair')" class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider" data-sort="pair">Pair</th>
+                                        <th onclick="sortJournal('direction')" class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider" data-sort="direction">Direction</th>
+                                        <th class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider">Entry → Exit</th>
+                                        <th onclick="sortJournal('lots')" class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider" data-sort="lots">Lots</th>
+                                        <th onclick="sortJournal('pl')" class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider" data-sort="pl">P/L</th>
+                                        <th class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider">R:R</th>
+                                        <th class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider">Result</th>
+                                        <th class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider">Strategy / Notes</th>
+                                        <th class="text-left py-4 px-4 font-medium text-zinc-400 text-xs uppercase tracking-wider">Balance</th>
+                                        <th class="w-28 py-4 px-4"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="journal-table" class="text-sm"></tbody>
@@ -1557,13 +1728,17 @@
                         </div>
                     </div>
 
-                    <div id="pagination" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 px-2 text-sm">
-                        <div class="text-zinc-400" id="page-info">Showing 1-10 of 0</div>
+                    <!-- Mobile Cards -->
+                    <div class="lg:hidden space-y-3" id="journal-cards"></div>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 px-1 text-sm">
+                        <div class="text-zinc-400" id="page-info">Showing 0 of 0</div>
                         <div class="flex gap-2">
                             <button onclick="prevPage()" id="prev-page-btn" 
-                                    class="px-4 py-2 border border-zinc-700 rounded-2xl hover:bg-zinc-800 disabled:opacity-50">Previous</button>
+                                    class="px-4 py-2 border border-zinc-700 rounded-xl hover:bg-zinc-800 disabled:opacity-40 text-sm font-medium transition">Previous</button>
                             <button onclick="nextPage()" id="next-page-btn"
-                                    class="px-4 py-2 border border-zinc-700 rounded-2xl hover:bg-zinc-800 disabled:opacity-50">Next</button>
+                                    class="px-4 py-2 border border-zinc-700 rounded-xl hover:bg-zinc-800 disabled:opacity-40 text-sm font-medium transition">Next</button>
                         </div>
                     </div>
                 </div>
@@ -1669,9 +1844,7 @@
                 <button onclick="closeModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
             </div>
            
-            <div class="p-6 overflow-auto flex-1" id="modal-content">
-                <!-- Populated by JS -->
-            </div>
+            <div class="p-6 overflow-auto flex-1" id="modal-content"></div>
            
             <div class="p-6 border-t border-zinc-800 flex justify-end gap-4">
                 <button onclick="closeModal()"
@@ -1692,9 +1865,7 @@
                 </div>
                 <button onclick="closeDayTradesModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
             </div>
-            <div class="p-5 overflow-auto flex-1" id="day-modal-content">
-                <!-- Populated by JS -->
-            </div>
+            <div class="p-5 overflow-auto flex-1" id="day-modal-content"></div>
             <div class="p-5 border-t border-zinc-800 flex justify-end">
                 <button onclick="closeDayTradesModal()" class="px-6 py-2.5 border border-zinc-700 rounded-2xl hover:bg-zinc-800 text-sm">
                     Close
@@ -1712,9 +1883,7 @@
                     <button onclick="closeAccountsModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
                 </div>
                 
-                <div id="accounts-list" class="space-y-3 mb-8 max-h-96 overflow-auto">
-                    <!-- Populated by JS -->
-                </div>
+                <div id="accounts-list" class="space-y-3 mb-8 max-h-96 overflow-auto"></div>
                 
                 <div class="border-t border-zinc-700 pt-6">
                     <div class="flex gap-3">
@@ -1810,10 +1979,18 @@
         let currentScreenshots = [];
         let calendarFilter = 'all';
 
-        let currentSort = { column: 1, direction: 'desc' };
-        let currentFilter = 'all';
+        // Journal state
+        let journalFilters = {
+            result: 'all',
+            direction: 'all',
+            pl: 'all',
+            search: '',
+            dateFrom: '',
+            dateTo: ''
+        };
+        let currentSort = { column: 'date', direction: 'desc' };
         let currentPage = 1;
-        const PAGE_SIZE = 15;
+        const PAGE_SIZE = 12;
 
         function getUsers() {
             const users = localStorage.getItem('xaffordsfx_users');
@@ -2120,6 +2297,17 @@
             if (window.innerWidth < 768) sidebar.classList.remove('open');
         }
 
+        function setTradeDateToNow() {
+            const now = new Date();
+            // Format for datetime-local: YYYY-MM-DDTHH:mm
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('trade-date').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
         function resetNewTradeForm() {
             document.getElementById('trade-form').reset();
             document.getElementById('image-preview-container').innerHTML = '';
@@ -2146,9 +2334,7 @@
             document.querySelectorAll('input[name="size-appropriate"][value="Yes"]').forEach(r => r.checked = true);
             document.querySelectorAll('input[name="maintained-rr"][value="Yes"]').forEach(r => r.checked = true);
             
-            const now = new Date();
-            const localDate = now.toISOString().slice(0,16);
-            document.getElementById('trade-date').value = localDate;
+            setTradeDateToNow();
             document.getElementById('lot-size').value = "0.1";
         }
        
@@ -2342,6 +2528,20 @@
             return { avg: count ? (totalRR / count) : 0, count: count };
         }
 
+        function calculateTradeRR(trade) {
+            if (!trade.sl || !trade.tp) return null;
+            let risk, reward;
+            if (trade.direction === 'Buy') {
+                risk = trade.entry - trade.sl;
+                reward = trade.tp - trade.entry;
+            } else {
+                risk = trade.sl - trade.entry;
+                reward = trade.entry - trade.tp;
+            }
+            if (risk <= 0) return null;
+            return reward / risk;
+        }
+
         function calculateDirectionStats(account) {
             let longWins = 0, longLosses = 0, shortWins = 0, shortLosses = 0;
             account.trades.forEach(t => {
@@ -2413,6 +2613,35 @@
             return (val >= 0 ? '+' : '') + '$' + val.toFixed(2);
         }
 
+        function getTradeResult(trade) {
+            if (trade.pl > 0) return 'win';
+            if (trade.pl < 0) return 'loss';
+            return 'be';
+        }
+
+        function getStrategySummary(trade) {
+            const parts = [];
+            if (trade.exitNotes && trade.exitNotes.outcomeReason) {
+                parts.push(trade.exitNotes.outcomeReason);
+            }
+            if (trade.exitNotes && trade.exitNotes.marketStructure) {
+                parts.push(trade.exitNotes.marketStructure);
+            }
+            if (trade.entryReasoning) {
+                const er = trade.entryReasoning;
+                const count = [er.htfStructure, er.inverseStructure, er.breakoutZone, er.entrySetup, er.tpLevels].filter(Boolean).length;
+                if (count > 0) parts.push(`${count} confluence`);
+            }
+            return parts.length ? parts.join(' · ') : '—';
+        }
+
+        function getNotesSnippet(trade) {
+            if (trade.exitNotes && trade.exitNotes.whatDifferently) {
+                return trade.exitNotes.whatDifferently.substring(0, 80) + (trade.exitNotes.whatDifferently.length > 80 ? '…' : '');
+            }
+            return '';
+        }
+
         // ========== PREMIUM CALENDAR ==========
         function renderCalendar() {
             const account = getCurrentAccount();
@@ -2424,7 +2653,6 @@
            
             const dailyStats = getDailyStats(account);
             
-            // Monthly aggregates
             let monthlyPL = 0;
             let tradingDays = 0;
             let winDays = 0;
@@ -2456,10 +2684,8 @@
             weeklyEl.textContent = formatPLFull(weeklyPL);
             weeklyEl.className = 'value ' + (weeklyPL >= 0 ? 'text-emerald-400' : 'text-red-400');
            
-            // Weekly chips for the visible month
             renderWeeklyChips(year, month, dailyStats);
            
-            // Max abs PL for heatmap (current month)
             let maxAbsPL = 0;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let d = 1; d <= daysInMonth; d++) {
@@ -2472,13 +2698,11 @@
             const grid = document.getElementById('calendar-grid');
             let html = '';
            
-            // Weekday headers
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             days.forEach(d => {
                 html += `<div class="calendar-weekday">${d}</div>`;
             });
            
-            // Leading empties
             for (let i = 0; i < firstDay; i++) {
                 html += `<div class="calendar-day empty"></div>`;
             }
@@ -2495,7 +2719,6 @@
                 if (isToday) cellClass += ' today';
                 if (stats.count > 0) cellClass += ' has-trades';
                 
-                // Heatmap
                 if (maxAbsPL > 0 && stats.pl !== 0) {
                     const ratio = Math.abs(stats.pl) / maxAbsPL;
                     let level = 1;
@@ -2507,7 +2730,6 @@
                     cellClass += ' heat-breakeven';
                 }
                 
-                // Filter matching
                 const passesFilter = dayPassesFilter(stats);
                 if (!passesFilter) cellClass += ' filtered-out';
                 
@@ -2541,7 +2763,6 @@
                     metaHTML = `<div class="day-empty-state">—</div>`;
                 }
                 
-                // Tooltip
                 let tipHTML = '';
                 if (stats.count > 0) {
                     tipHTML = `
@@ -2569,7 +2790,6 @@
                 `;
             }
            
-            // Trailing empties to complete the grid
             const totalCells = firstDay + daysInMonth;
             const trailing = (7 - (totalCells % 7)) % 7;
             for (let i = 0; i < trailing; i++) {
@@ -2602,7 +2822,6 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const firstDay = new Date(year, month, 1).getDay();
             
-            // Build weeks of the month
             const weeks = [];
             let currentWeek = { start: 1, pl: 0, days: 0 };
             let dayOfWeek = firstDay;
@@ -2674,7 +2893,7 @@
                         <div class="flex items-center gap-3 min-w-0">
                             <span class="font-mono font-semibold text-base">${trade.pair}</span>
                             <span class="px-2.5 py-0.5 text-xs rounded-full ${trade.direction === 'Buy' ? 'bg-emerald-900/60 text-emerald-400' : 'bg-red-900/60 text-red-400'}">
-                                ${trade.direction}
+                                ${trade.direction === 'Buy' ? 'Long' : 'Short'}
                             </span>
                         </div>
                         <div class="text-right shrink-0">
@@ -2712,7 +2931,6 @@
             document.getElementById('total-pl-display').textContent = (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(2);
             document.getElementById('total-pl-display').className = totalPL >= 0 ? "font-medium text-emerald-500" : "font-medium text-red-500";
            
-            // Direction breakdown
             const dirStats = calculateDirectionStats(account);
             document.getElementById('long-wins').textContent = dirStats.longWins;
             document.getElementById('long-losses').textContent = dirStats.longLosses;
@@ -2753,7 +2971,7 @@
                         <div>
                             <span class="font-mono text-lg">${trade.pair}</span>
                             <span class="ml-3 px-3 py-1 text-xs rounded-full ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
-                                ${trade.direction}
+                                ${trade.direction === 'Buy' ? 'Long' : 'Short'}
                             </span>
                         </div>
                         <div class="text-right">
@@ -2772,105 +2990,313 @@
             renderCalendar();
         }
 
+        // ========== JOURNAL HISTORY - CORE ==========
+        function getFilteredTrades() {
+            const account = getCurrentAccount();
+            let trades = [...account.trades];
+
+            // Search
+            const q = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            if (q) {
+                trades = trades.filter(t => {
+                    const pair = (t.pair || '').toLowerCase();
+                    const outcome = (t.exitNotes?.outcomeReason || '').toLowerCase();
+                    const notes = (t.exitNotes?.whatDifferently || '').toLowerCase();
+                    const structure = (t.exitNotes?.marketStructure || '').toLowerCase();
+                    return pair.includes(q) || outcome.includes(q) || notes.includes(q) || structure.includes(q);
+                });
+            }
+
+            // Date range
+            const from = document.getElementById('filter-date-from')?.value;
+            const to = document.getElementById('filter-date-to')?.value;
+            if (from) {
+                const fromDate = new Date(from);
+                fromDate.setHours(0,0,0,0);
+                trades = trades.filter(t => new Date(t.date) >= fromDate);
+            }
+            if (to) {
+                const toDate = new Date(to);
+                toDate.setHours(23,59,59,999);
+                trades = trades.filter(t => new Date(t.date) <= toDate);
+            }
+
+            // Result
+            if (journalFilters.result === 'win') trades = trades.filter(t => t.pl > 0);
+            else if (journalFilters.result === 'loss') trades = trades.filter(t => t.pl < 0);
+
+            // Direction
+            if (journalFilters.direction !== 'all') {
+                trades = trades.filter(t => t.direction === journalFilters.direction);
+            }
+
+            // P/L profitability (same as result but kept for clarity)
+            if (journalFilters.pl === 'profit') trades = trades.filter(t => t.pl > 0);
+            else if (journalFilters.pl === 'loss') trades = trades.filter(t => t.pl < 0);
+
+            // Sort
+            trades.sort((a, b) => {
+                let va, vb;
+                switch (currentSort.column) {
+                    case 'date':
+                        va = new Date(a.date).getTime();
+                        vb = new Date(b.date).getTime();
+                        break;
+                    case 'pair':
+                        va = (a.pair || '').toUpperCase();
+                        vb = (b.pair || '').toUpperCase();
+                        break;
+                    case 'direction':
+                        va = a.direction;
+                        vb = b.direction;
+                        break;
+                    case 'lots':
+                        va = a.lots || 0;
+                        vb = b.lots || 0;
+                        break;
+                    case 'pl':
+                        va = a.pl || 0;
+                        vb = b.pl || 0;
+                        break;
+                    default:
+                        va = new Date(a.date).getTime();
+                        vb = new Date(b.date).getTime();
+                }
+                if (va < vb) return currentSort.direction === 'asc' ? -1 : 1;
+                if (va > vb) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            return trades;
+        }
+
+        function updateJournalStats(trades) {
+            const count = trades.length;
+            const totalPL = trades.reduce((s, t) => s + (t.pl || 0), 0);
+            const wins = trades.filter(t => t.pl > 0).length;
+            const losses = trades.filter(t => t.pl < 0).length;
+            const winRate = count ? (wins / count * 100) : 0;
+            const avg = count ? totalPL / count : 0;
+            const longs = trades.filter(t => t.direction === 'Buy').length;
+            const shorts = trades.filter(t => t.direction === 'Sell').length;
+
+            document.getElementById('js-count').textContent = count;
+            const plEl = document.getElementById('js-pl');
+            plEl.textContent = formatPLFull(totalPL);
+            plEl.className = 'stat-value ' + (totalPL >= 0 ? 'text-emerald-400' : 'text-red-400');
+            document.getElementById('js-winrate').textContent = winRate.toFixed(1) + '%';
+            document.getElementById('js-wl').textContent = `${wins} / ${losses}`;
+            const avgEl = document.getElementById('js-avg');
+            avgEl.textContent = formatPLFull(avg);
+            avgEl.className = 'stat-value ' + (avg >= 0 ? 'text-emerald-400' : 'text-red-400');
+            document.getElementById('js-dir').textContent = `${longs} / ${shorts}`;
+        }
+
         function renderJournal() {
             const account = getCurrentAccount();
+            const filtered = getFilteredTrades();
+            updateJournalStats(filtered);
+
+            // Running balance map (chronological)
+            const allSorted = [...account.trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let running = account.startingBalance;
+            const balanceMap = new Map();
+            allSorted.forEach(t => {
+                running += (t.pl || 0);
+                balanceMap.set(t.id, running);
+            });
+
+            const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageTrades = filtered.slice(start, start + PAGE_SIZE);
+
+            document.getElementById('page-info').textContent = 
+                filtered.length === 0 
+                    ? 'No trades match filters' 
+                    : `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, filtered.length)} of ${filtered.length}`;
+            document.getElementById('prev-page-btn').disabled = currentPage <= 1;
+            document.getElementById('next-page-btn').disabled = currentPage >= totalPages;
+
+            // Update sort indicators
+            document.querySelectorAll('.journal-table th[data-sort]').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.sort === currentSort.column) {
+                    th.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            });
+
+            // Desktop table
             const tbody = document.getElementById('journal-table');
             tbody.innerHTML = '';
-           
-            let filteredTrades = [...account.trades];
-            
-            if (currentFilter === 'profit') {
-                filteredTrades = filteredTrades.filter(t => t.pl > 0);
-            } else if (currentFilter === 'loss') {
-                filteredTrades = filteredTrades.filter(t => t.pl < 0);
-            }
-            
-            const query = document.getElementById('search-input').value.toLowerCase();
-            if (query) {
-                filteredTrades = filteredTrades.filter(t => t.pair.toLowerCase().includes(query));
-            }
-            
-            filteredTrades.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            const totalPages = Math.ceil(filteredTrades.length / PAGE_SIZE) || 1;
-            const start = (currentPage - 1) * PAGE_SIZE;
-            const paginatedTrades = filteredTrades.slice(start, start + PAGE_SIZE);
-            
-            const allTradesSorted = [...account.trades].sort((a, b) => new Date(a.date) - new Date(b.date));
-            let globalRunning = account.startingBalance;
-            const tradeBalanceMap = new Map();
-            
-            allTradesSorted.forEach(t => {
-                globalRunning += (t.pl || 0);
-                tradeBalanceMap.set(t.id, globalRunning);
-            });
-            
-            document.getElementById('page-info').textContent = 
-                `Showing ${start + 1}-${Math.min(start + PAGE_SIZE, filteredTrades.length)} of ${filteredTrades.length}`;
-            
-            document.getElementById('prev-page-btn').disabled = currentPage === 1;
-            document.getElementById('next-page-btn').disabled = currentPage === totalPages;
-            
-            paginatedTrades.forEach((trade) => {
-                const runningBalance = tradeBalanceMap.get(trade.id) || account.startingBalance + (trade.pl || 0);
-               
-                const row = document.createElement('tr');
-                row.className = 'trade-row border-b border-zinc-800 hover:bg-zinc-800/50 transition';
-                row.dataset.tradeId = trade.id;
-                
-                row.innerHTML = `
-                    <td class="py-5 px-6 whitespace-nowrap">${new Date(trade.date).toLocaleDateString()}</td>
-                    <td class="py-5 px-6 font-medium font-mono">${trade.pair}</td>
-                    <td class="py-5 px-6">
-                        <span class="px-4 py-1 text-xs rounded-2xl ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
-                            ${trade.direction}
-                        </span>
-                    </td>
-                    <td class="py-5 px-6 font-mono whitespace-nowrap">
-                        ${trade.entry} → ${trade.exit}
-                    </td>
-                    <td class="py-5 px-6 font-mono text-emerald-300">${trade.lots || '0.10'}</td>
-                    <td class="py-5 px-6 font-semibold ${trade.pl >= 0 ? 'profit' : 'loss'}">
-                        ${trade.pl >= 0 ? '+' : ''}$${(trade.pl || 0).toFixed(2)}
-                    </td>
-                    <td class="py-5 px-6 font-mono whitespace-nowrap">
-                        $${runningBalance.toFixed(2)}
-                    </td>
-                    <td class="py-5 px-6">
-                        ${trade.screenshots && trade.screenshots.length > 0 ? 
-                            `<span onclick="event.stopImmediatePropagation(); viewScreenshots(${trade.id});" class="text-emerald-500 hover:underline cursor-pointer">${trade.screenshots.length} images</span>` :
-                            `<span class="text-zinc-600">None</span>`}
-                    </td>
-                    <td class="py-5 px-6">
-                        <div class="flex gap-2">
-                            <button onclick="event.stopImmediatePropagation(); showTradeDetailFromJournal(${trade.id});" 
-                                    class="text-emerald-400 hover:text-emerald-500 p-2">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button onclick="event.stopImmediatePropagation(); deleteTrade(${trade.id});" 
-                                    class="text-red-400 hover:text-red-500 p-2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                row.onclick = (e) => {
-                    if (!e.target.closest('button')) {
-                        showTradeDetail(trade);
-                    }
-                };
-                tbody.appendChild(row);
-            });
-            
-            if (paginatedTrades.length === 0) {
+
+            if (pageTrades.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="py-20 text-center text-zinc-500">
-                            No trades found. Try adjusting your filters.
+                        <td colspan="11" class="py-16 text-center text-zinc-500">
+                            <div class="flex flex-col items-center gap-2">
+                                <i class="fas fa-search text-2xl text-zinc-600"></i>
+                                <span>No trades found. Adjust filters or log a new trade.</span>
+                            </div>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
+            } else {
+                pageTrades.forEach(trade => {
+                    const bal = balanceMap.get(trade.id) ?? (account.startingBalance + (trade.pl || 0));
+                    const result = getTradeResult(trade);
+                    const rr = calculateTradeRR(trade);
+                    const strategy = getStrategySummary(trade);
+                    const notes = getNotesSnippet(trade);
+
+                    const row = document.createElement('tr');
+                    row.className = 'trade-row border-b border-zinc-800/80';
+                    row.onclick = (e) => {
+                        if (!e.target.closest('button')) showTradeDetail(trade);
+                    };
+                    row.style.cursor = 'pointer';
+
+                    row.innerHTML = `
+                        <td class="py-4 px-4 whitespace-nowrap text-zinc-300">
+                            <div class="font-medium">${new Date(trade.date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'2-digit'})}</div>
+                            <div class="text-xs text-zinc-500">${new Date(trade.date).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</div>
+                        </td>
+                        <td class="py-4 px-4 font-mono font-semibold text-zinc-100">${trade.pair}</td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${trade.direction === 'Buy' ? 'dir-badge-long' : 'dir-badge-short'}">
+                                <i class="fas fa-arrow-${trade.direction === 'Buy' ? 'up' : 'down'} text-[10px]"></i>
+                                ${trade.direction === 'Buy' ? 'Long' : 'Short'}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 font-mono text-zinc-300 whitespace-nowrap text-sm">
+                            ${Number(trade.entry).toFixed(trade.entry < 10 ? 5 : 2)} → ${Number(trade.exit).toFixed(trade.exit < 10 ? 5 : 2)}
+                        </td>
+                        <td class="py-4 px-4 font-mono text-zinc-400">${(trade.lots || 0.1).toFixed(2)}</td>
+                        <td class="py-4 px-4 font-semibold font-mono ${trade.pl >= 0 ? 'profit' : 'loss'}">
+                            ${formatPLFull(trade.pl || 0)}
+                        </td>
+                        <td class="py-4 px-4 text-zinc-400 font-mono text-sm">
+                            ${rr !== null ? '1:' + rr.toFixed(2) : '—'}
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${result === 'win' ? 'result-win' : result === 'loss' ? 'result-loss' : 'result-be'}">
+                                ${result === 'win' ? 'Win' : result === 'loss' ? 'Loss' : 'BE'}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 max-w-[200px]">
+                            <div class="text-xs text-zinc-300 truncate" title="${strategy}">${strategy}</div>
+                            ${notes ? `<div class="text-[11px] text-zinc-500 mt-0.5 truncate" title="${notes}">${notes}</div>` : ''}
+                        </td>
+                        <td class="py-4 px-4 font-mono text-zinc-400 text-sm whitespace-nowrap">$${bal.toFixed(2)}</td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-1">
+                                <button onclick="event.stopImmediatePropagation(); showTradeDetailFromJournal(${trade.id});" 
+                                        class="p-2 text-zinc-400 hover:text-emerald-400 rounded-lg hover:bg-zinc-800 transition" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="event.stopImmediatePropagation(); deleteTrade(${trade.id});" 
+                                        class="p-2 text-zinc-400 hover:text-red-400 rounded-lg hover:bg-zinc-800 transition" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
             }
+
+            // Mobile cards
+            const cardsContainer = document.getElementById('journal-cards');
+            cardsContainer.innerHTML = '';
+
+            if (pageTrades.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div class="text-center py-16 text-zinc-500">
+                        <i class="fas fa-search text-2xl text-zinc-600 mb-3 block"></i>
+                        No trades match your filters.
+                    </div>`;
+            } else {
+                pageTrades.forEach(trade => {
+                    const bal = balanceMap.get(trade.id) ?? (account.startingBalance + (trade.pl || 0));
+                    const result = getTradeResult(trade);
+                    const rr = calculateTradeRR(trade);
+                    const strategy = getStrategySummary(trade);
+
+                    const card = document.createElement('div');
+                    card.className = `journal-card ${trade.direction === 'Buy' ? 'long-accent' : 'short-accent'}`;
+                    card.onclick = () => showTradeDetail(trade);
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-mono font-bold text-lg">${trade.pair}</span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${trade.direction === 'Buy' ? 'dir-badge-long' : 'dir-badge-short'}">
+                                        ${trade.direction === 'Buy' ? 'Long' : 'Short'}
+                                    </span>
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${result === 'win' ? 'result-win' : result === 'loss' ? 'result-loss' : 'result-be'}">
+                                        ${result === 'win' ? 'Win' : result === 'loss' ? 'Loss' : 'BE'}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-zinc-500 mt-1">
+                                    ${new Date(trade.date).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-lg font-bold font-mono ${trade.pl >= 0 ? 'profit' : 'loss'}">${formatPLFull(trade.pl || 0)}</div>
+                                <div class="text-xs text-zinc-500">Bal $${bal.toFixed(0)}</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-400">
+                            <span class="font-mono">${Number(trade.entry).toFixed(trade.entry < 10 ? 4 : 2)} → ${Number(trade.exit).toFixed(trade.exit < 10 ? 4 : 2)}</span>
+                            <span>${(trade.lots || 0.1).toFixed(2)} lots</span>
+                            ${rr !== null ? `<span>R:R 1:${rr.toFixed(2)}</span>` : ''}
+                        </div>
+                        ${strategy !== '—' ? `<div class="mt-2 text-xs text-zinc-500 truncate">${strategy}</div>` : ''}
+                        <div class="mt-3 flex justify-end gap-2">
+                            <button onclick="event.stopImmediatePropagation(); showTradeDetailFromJournal(${trade.id});" 
+                                    class="px-3 py-1.5 text-xs text-emerald-400 border border-zinc-700 rounded-lg hover:bg-zinc-800">View</button>
+                            <button onclick="event.stopImmediatePropagation(); deleteTrade(${trade.id});" 
+                                    class="px-3 py-1.5 text-xs text-red-400 border border-zinc-700 rounded-lg hover:bg-zinc-800">Delete</button>
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
+                });
+            }
+        }
+
+        function setJournalFilter(group, value, el) {
+            journalFilters[group] = value;
+            document.querySelectorAll(`[data-group="${group}"]`).forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            currentPage = 1;
+            renderJournal();
+        }
+
+        function applyJournalFilters() {
+            currentPage = 1;
+            renderJournal();
+        }
+
+        function clearAllJournalFilters() {
+            journalFilters = { result: 'all', direction: 'all', pl: 'all', search: '', dateFrom: '', dateTo: '' };
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.querySelectorAll('.filter-chip').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.value === 'all') btn.classList.add('active');
+            });
+            currentPage = 1;
+            renderJournal();
+        }
+
+        function sortJournal(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = column === 'date' || column === 'pl' ? 'desc' : 'asc';
+            }
+            renderJournal();
         }
 
         function deleteTrade(id) {
@@ -2885,31 +3311,6 @@
                 }
                 alert('Trade deleted successfully.');
             }
-        }
-
-        function sortTable(column) {
-            if (currentSort.column === column) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = column;
-                currentSort.direction = 'desc';
-            }
-            renderJournal();
-        }
-
-        function toggleFilter(el) {
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.classList.remove('active', 'bg-emerald-500', 'text-black');
-            });
-            el.classList.add('active', 'bg-emerald-500', 'text-black');
-            currentFilter = el.dataset.filter;
-            currentPage = 1;
-            renderJournal();
-        }
-
-        function filterTrades() {
-            currentPage = 1;
-            renderJournal();
         }
 
         function prevPage() {
@@ -3128,7 +3529,6 @@
         }
        
         function showTradeDetail(trade) {
-            // Support both object and stringified (from day modal)
             if (typeof trade === 'string') {
                 try { trade = JSON.parse(trade); } catch(e) { return; }
             }
@@ -3207,21 +3607,27 @@
                     </div>
                 `;
             }
+
+            const rr = calculateTradeRR(trade);
+            const result = getTradeResult(trade);
            
             let html = `
                 <div class="flex flex-col md:flex-row justify-between items-start gap-6">
                     <div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 flex-wrap">
                             <span class="font-mono text-3xl">${trade.pair}</span>
-                            <span class="px-5 py-2 text-sm rounded-3xl ${trade.direction === 'Buy' ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}">
-                                ${trade.direction.toUpperCase()}
+                            <span class="px-4 py-1.5 text-sm rounded-full font-semibold ${trade.direction === 'Buy' ? 'dir-badge-long' : 'dir-badge-short'}">
+                                ${trade.direction === 'Buy' ? 'LONG' : 'SHORT'}
+                            </span>
+                            <span class="px-3 py-1 text-xs rounded-full font-semibold ${result === 'win' ? 'result-win' : result === 'loss' ? 'result-loss' : 'result-be'}">
+                                ${result === 'win' ? 'Win' : result === 'loss' ? 'Loss' : 'Break-even'}
                             </span>
                         </div>
                         <p class="text-zinc-500 mt-1">${new Date(trade.date).toLocaleString()}</p>
                     </div>
                     <div class="text-right">
                         <div class="text-4xl font-bold ${trade.pl >= 0 ? 'profit' : 'loss'}">
-                            ${trade.pl >= 0 ? '+' : ''}$${(trade.pl || 0).toFixed(2)}
+                            ${formatPLFull(trade.pl || 0)}
                         </div>
                         <div class="text-xs text-zinc-500">P/L</div>
                     </div>
@@ -3250,6 +3656,10 @@
                         <div>
                             <div class="text-zinc-400 text-sm">Take Profit</div>
                             <div class="text-2xl font-mono">${trade.tp || '—'}</div>
+                        </div>
+                        <div>
+                            <div class="text-zinc-400 text-sm">Risk : Reward</div>
+                            <div class="text-2xl font-mono">${rr !== null ? '1:' + rr.toFixed(2) : '—'}</div>
                         </div>
                     </div>
                 </div>
@@ -3529,7 +3939,7 @@
                 showLogin();
             }
             
-            console.log('%cXAffordsFX Professional Trading Journal v4.0 — Premium Calendar', 'color:#00ff9d; font-weight:bold; font-size:14px');
+            console.log('%cXAffordsFX Professional Trading Journal v4.1 — Optimized Journal History', 'color:#00ff9d; font-weight:bold; font-size:14px');
         };
 
         document.addEventListener('click', function(e) {
