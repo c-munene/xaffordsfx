@@ -14,8 +14,37 @@
             --primary: #00ff9d;
         }
        
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #3f3f46 transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 9999px;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
         }
 
         .logo-font {
@@ -25,6 +54,12 @@
         .main-content {
             position: relative;
             z-index: 2;
+        }
+
+        #content-area {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
         }
 
         .trade-card {
@@ -61,78 +96,502 @@
             font-size: 1.1rem;
         }
 
-        /* Enhanced Calendar Styles */
-        .calendar-table {
-            border-collapse: collapse;
-            width: 100%;
-            background: #18181b;
-            border-radius: 16px;
+        /* ========== PREMIUM CALENDAR ========== */
+        .calendar-section {
+            background: linear-gradient(160deg, #18181b 0%, #1c1c20 100%);
+            border-radius: 24px;
+            border: 1px solid #27272a;
             overflow: hidden;
         }
-        .calendar-table th, .calendar-table td {
-            border: 1px solid #27272a;
-            height: 110px;
-            vertical-align: top;
-            position: relative;
-            padding: 8px;
-            transition: all 0.2s ease;
+
+        .calendar-header-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 24px 12px;
+            border-bottom: 1px solid #27272a;
         }
-        .calendar-table th {
-            height: 48px;
-            vertical-align: middle;
-            font-weight: 600;
-            color: #a1a1aa;
+
+        .calendar-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cal-nav-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
             background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #e4e4e7;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
-        .calendar-day {
+
+        .cal-nav-btn:hover {
+            background: #3f3f46;
+            border-color: #52525b;
+            color: #fff;
+        }
+
+        .cal-today-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.35);
+            color: #00ff9d;
             font-size: 0.8rem;
-            padding: 4px 8px;
-            text-align: right;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
-        .calendar-pl {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 0.95rem;
+
+        .cal-today-btn:hover {
+            background: rgba(0, 255, 157, 0.2);
+            border-color: #00ff9d;
+        }
+
+        .calendar-month-title {
+            font-size: 1.25rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fafafa;
+            min-width: 180px;
             text-align: center;
-            width: 88%;
-            padding: 4px 6px;
+        }
+
+        .monthly-summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 24px;
+            background: #141416;
+            border-bottom: 1px solid #27272a;
+        }
+
+        .monthly-stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 14px;
+            background: #1f1f23;
+            border: 1px solid #2e2e33;
+            font-size: 0.85rem;
+        }
+
+        .monthly-stat-pill .label {
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+
+        .monthly-stat-pill .value {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .weekly-scroll-container {
+            padding: 14px 20px 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .weekly-pl-list {
+            display: flex;
+            gap: 10px;
+            min-width: max-content;
+            padding-bottom: 4px;
+        }
+
+        .week-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #1f1f23;
+            border: 1px solid #2e2e33;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .week-chip:hover {
+            border-color: #3f3f46;
+            transform: translateY(-1px);
+        }
+
+        .week-chip .week-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            margin-bottom: 4px;
+        }
+
+        .week-chip .week-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .week-chip.profit .week-value { color: #34d399; }
+        .week-chip.loss .week-value { color: #f87171; }
+        .week-chip.neutral .week-value { color: #a1a1aa; }
+
+        .calendar-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 20px 16px;
+            border-bottom: 1px solid #27272a;
+        }
+
+        .cal-filter-chip {
+            padding: 7px 14px;
             border-radius: 9999px;
-            white-space: nowrap;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .cal-filter-chip:hover {
+            background: #3f3f46;
+            color: #e4e4e7;
+        }
+
+        .cal-filter-chip.active {
+            background: rgba(0, 255, 157, 0.15);
+            border-color: #00ff9d;
+            color: #00ff9d;
+        }
+
+        .calendar-grid-wrapper {
+            padding: 12px 16px 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 6px;
+            min-width: 640px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #71717a;
+            padding: 10px 4px 8px;
+        }
+
+        .calendar-day {
+            position: relative;
+            min-height: 118px;
+            border-radius: 16px;
+            background: #18181b;
+            border: 1px solid #27272a;
+            padding: 8px 8px 10px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+            overflow: hidden;
+        }
+
+        .calendar-day.empty {
+            background: #121214;
+            border-color: transparent;
+            min-height: 118px;
+            cursor: default;
+        }
+
+        .calendar-day.has-trades {
+            cursor: pointer;
+        }
+
+        .calendar-day.has-trades:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45);
+            border-color: #3f3f46;
+            z-index: 2;
+        }
+
+        .calendar-day.today {
+            border-color: #67e8f9;
+            box-shadow: inset 0 0 0 1.5px #67e8f9;
+        }
+
+        .calendar-day.filtered-out {
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        /* Heatmap intensities */
+        .calendar-day.heat-profit-1 { background: rgba(16, 185, 129, 0.07); }
+        .calendar-day.heat-profit-2 { background: rgba(16, 185, 129, 0.14); }
+        .calendar-day.heat-profit-3 { background: rgba(16, 185, 129, 0.24); }
+        .calendar-day.heat-profit-4 { background: rgba(16, 185, 129, 0.36); }
+        .calendar-day.heat-loss-1 { background: rgba(239, 68, 68, 0.07); }
+        .calendar-day.heat-loss-2 { background: rgba(239, 68, 68, 0.14); }
+        .calendar-day.heat-loss-3 { background: rgba(239, 68, 68, 0.24); }
+        .calendar-day.heat-loss-4 { background: rgba(239, 68, 68, 0.36); }
+        .calendar-day.heat-breakeven { background: rgba(113, 113, 122, 0.1); }
+
+        .day-number {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #71717a;
+            align-self: flex-end;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .calendar-day.today .day-number {
+            color: #67e8f9;
+            font-weight: 700;
+        }
+
+        .day-pl {
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.01em;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 1.1;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
+            text-align: center;
+            margin: 0 auto 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
             transition: transform 0.2s ease;
         }
-        .calendar-day:hover .calendar-pl {
-            transform: translate(-50%, -50%) scale(1.05);
+
+        .calendar-day.has-trades:hover .day-pl {
+            transform: scale(1.04);
         }
-        .calendar-day-number {
-            font-weight: 700;
-            color: #e2e8f0;
-            position: absolute;
-            top: 8px;
-            right: 10px;
-            font-size: 0.9rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .calendar-day.today {
-            background: linear-gradient(145deg, #27272a, #18181b);
-            box-shadow: inset 0 0 0 3px #67e8f9;
-        }
-        .calendar-day.has-trades {
-            background: linear-gradient(145deg, #1f2937, #111827);
-        }
-        .calendar-pl.profit {
+
+        .day-pl.profit {
+            background: rgba(16, 185, 129, 0.2);
             color: #34d399;
-            font-weight: 700;
+            border: 1px solid rgba(52, 211, 153, 0.35);
         }
-        .calendar-pl.loss {
+
+        .day-pl.loss {
+            background: rgba(239, 68, 68, 0.2);
             color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.35);
+        }
+
+        .day-pl.zero {
+            background: rgba(113, 113, 122, 0.18);
+            color: #a1a1aa;
+            border: 1px solid rgba(113, 113, 122, 0.3);
+        }
+
+        .day-meta {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 100%;
+        }
+
+        .day-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: #a1a1aa;
+            line-height: 1.2;
+        }
+
+        .day-meta-row .meta-label {
+            color: #71717a;
+            font-weight: 500;
+        }
+
+        .day-meta-row .meta-value {
+            font-variant-numeric: tabular-nums;
+            color: #d4d4d8;
+        }
+
+        .day-meta-row .longs { color: #34d399; }
+        .day-meta-row .shorts { color: #f87171; }
+        .day-meta-row .winrate { color: #67e8f9; }
+
+        .day-empty-state {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: #52525b;
+            font-weight: 500;
+        }
+
+        /* Day tooltip / hover panel */
+        .day-tooltip {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            padding: 12px 14px;
+            background: #18181b;
+            border: 1px solid #3f3f46;
+            border-radius: 14px;
+            box-shadow: 0 12px 28px -6px rgba(0,0,0,0.55);
+            z-index: 30;
+            pointer-events: none;
+            font-size: 0.75rem;
+        }
+
+        .calendar-day:hover .day-tooltip {
+            display: block;
+            animation: tipFade 0.18s ease;
+        }
+
+        @keyframes tipFade {
+            from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .day-tooltip .tip-title {
             font-weight: 700;
+            color: #e4e4e7;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .day-tooltip .tip-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            color: #a1a1aa;
+        }
+
+        .day-tooltip .tip-row span:last-child {
+            font-weight: 600;
+            color: #fafafa;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Day trades modal list */
+        .day-trades-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .day-trade-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #1f1f23;
+            border: 1px solid #2e2e33;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-trade-item:hover {
+            border-color: #3f3f46;
+            background: #27272a;
+        }
+
+        /* Responsive calendar */
+        @media (max-width: 900px) {
+            .calendar-day {
+                min-height: 100px;
+                padding: 6px 5px 8px;
+            }
+            .day-pl {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+            .day-meta-row {
+                font-size: 0.58rem;
+            }
+            .calendar-grid {
+                gap: 4px;
+                min-width: 560px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .calendar-header-bar {
+                padding: 16px 14px 10px;
+            }
+            .calendar-month-title {
+                font-size: 1.05rem;
+                min-width: 140px;
+            }
+            .monthly-summary-row {
+                padding: 12px 14px;
+                gap: 8px;
+            }
+            .monthly-stat-pill {
+                padding: 8px 12px;
+                font-size: 0.78rem;
+            }
+            .calendar-filters {
+                padding: 10px 14px 12px;
+            }
+            .cal-filter-chip {
+                padding: 6px 11px;
+                font-size: 0.7rem;
+            }
+            .calendar-day {
+                min-height: 88px;
+                border-radius: 12px;
+            }
+            .day-number {
+                font-size: 0.7rem;
+            }
+            .day-pl {
+                font-size: 0.62rem;
+            }
+            .day-meta {
+                display: none;
+            }
+            .day-tooltip {
+                display: none !important;
+            }
+            .calendar-grid {
+                min-width: 480px;
+            }
+            .week-chip {
+                min-width: 78px;
+                padding: 8px 10px;
+            }
         }
 
         /* Auth Styles */
@@ -140,7 +599,6 @@
             background: linear-gradient(145deg, #18181b, #27272a);
         }
 
-        /* Multiple Screenshot Styles */
         .screenshot-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -176,7 +634,6 @@
             cursor: pointer;
         }
 
-        /* Lightbox */
         #lightbox {
             display: none;
             position: fixed;
@@ -195,7 +652,6 @@
             border-radius: 12px;
         }
 
-        /* Enhanced Journal Table */
         .journal-table th {
             position: relative;
             cursor: pointer;
@@ -225,7 +681,6 @@
             transition: all 0.2s;
         }
 
-        /* New Trade Enhancements */
         .input-focus {
             transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
@@ -238,12 +693,10 @@
             transition: all 0.3s ease;
         }
 
-        /* Dashboard glow effects */
         .dashboard-glow {
             box-shadow: 0 0 35px -5px rgb(16 185 129);
         }
 
-        /* Enhanced Notes / Notebook Styles */
         .notes-content {
             font-size: 1rem;
             line-height: 1.7;
@@ -283,7 +736,6 @@
             color: black;
         }
 
-        /* Enhanced Auth */
         .strength-meter {
             height: 6px;
             background: #27272a;
@@ -304,12 +756,10 @@
             border-color: #34d399;
         }
 
-        /* Header Account */
         .header-account {
             transition: all 0.2s ease;
         }
 
-        /* Account Selector */
         .account-selector {
             position: relative;
         }
@@ -331,7 +781,6 @@
             display: block;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -340,27 +789,19 @@
             .sidebar.open {
                 transform: translateX(0);
             }
-            .calendar-table th, .calendar-table td {
-                height: 90px;
-                padding: 6px 4px;
-            }
-            .calendar-pl {
-                font-size: 0.8rem;
-                padding: 3px 5px;
-            }
         }
 
         .table-container {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            overscroll-behavior-x: contain;
         }
 
-        /* Professional Analytics */
         .metric-card {
             background: linear-gradient(145deg, #18181b, #27272a);
         }
 
-        /* Adjust Balance Modal */
         .modal {
             animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -375,9 +816,50 @@
             }
         }
 
-        /* Enhanced Chart Styles */
         .chart-container {
             position: relative;
+        }
+
+        .radio-group label {
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .radio-group input:checked + span {
+            background-color: #00ff9d;
+            color: #000;
+            border-color: #00ff9d;
+        }
+        .section-card {
+            background: linear-gradient(145deg, #18181b, #1f1f23);
+            border: 1px solid #27272a;
+        }
+
+        .checklist-item {
+            transition: all 0.15s ease;
+        }
+        .checklist-item:hover {
+            background: rgba(0, 255, 157, 0.05);
+        }
+        .checklist-item input[type="checkbox"] {
+            accent-color: #00ff9d;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checklist-item input[type="checkbox"]:checked + span {
+            color: #00ff9d;
+        }
+
+        #dashboard-content,
+        #new-trade-content,
+        #journal-content,
+        #analytics-content {
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -544,7 +1026,6 @@
                     <h1 class="text-xl font-semibold" id="page-title">Dashboard</h1>
                 </div>
                
-                <!-- Account Selector -->
                 <div class="flex items-center gap-6 header-account">
                     <div onclick="showAccountSelector()" class="account-selector flex items-center gap-3 cursor-pointer group">
                         <div class="text-right">
@@ -562,14 +1043,12 @@
             <div class="flex-1 overflow-auto p-4 md:p-8 bg-zinc-950" id="content-area">
                 <!-- Dashboard Content -->
                 <div id="dashboard-content">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
                         <!-- Account Balance -->
-                        <div class="lg:col-span-2 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-zinc-700 dashboard-glow">
+                        <div class="lg:col-span-2 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 md:p-7 border border-zinc-700 dashboard-glow">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <div class="flex items-center gap-3">
-                                        <p class="text-zinc-400 text-sm">Account Balance</p>
-                                    </div>
+                                    <p class="text-zinc-400 text-sm">Account Balance</p>
                                     <p class="text-4xl md:text-5xl font-bold mt-3" id="account-balance">$10,000.00</p>
                                     <p class="text-emerald-500 text-sm mt-2 flex items-center gap-1" id="balance-change">
                                         +$0.00 (+0.00%)
@@ -577,13 +1056,13 @@
                                 </div>
                                 <div>
                                     <button onclick="showAdjustBalanceModal()" 
-                                            class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 hover:border-emerald-500 text-sm flex items-center gap-2 rounded-2xl transition-all duration-200">
+                                            class="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 hover:border-emerald-500 text-sm flex items-center gap-2 rounded-2xl transition-all duration-200">
                                         <i class="fas fa-sliders-h"></i>
                                         <span class="font-medium">Adjust</span>
                                     </button>
                                 </div>
                             </div>
-                            <div class="mt-6 text-xs text-zinc-500 flex flex-wrap items-center gap-4">
+                            <div class="mt-5 text-xs text-zinc-500 flex flex-wrap items-center gap-4">
                                 <div>Starting: <span id="starting-balance-display" class="font-medium text-zinc-300">$10,000.00</span></div>
                                 <div class="h-3 w-px bg-zinc-700 hidden sm:block"></div>
                                 <div>Total P/L: <span id="total-pl-display" class="font-medium text-emerald-500">+$0.00</span></div>
@@ -591,18 +1070,18 @@
                         </div>
                        
                         <!-- Win Rate -->
-                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
+                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-5 border border-zinc-700">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="text-zinc-400 text-sm">Win Rate</p>
-                                    <p class="text-4xl font-bold mt-2" id="win-rate">0%</p>
+                                    <p class="text-3xl font-bold mt-2" id="win-rate">0%</p>
                                 </div>
                             </div>
-                            <div class="mt-6 text-sm">
-                                <div class="h-2 bg-zinc-800 rounded-full mt-2 overflow-hidden">
+                            <div class="mt-5 text-sm">
+                                <div class="h-2 bg-zinc-800 rounded-full mt-1 overflow-hidden">
                                     <div id="win-rate-bar" class="h-full bg-emerald-500 rounded-full" style="width: 0%"></div>
                                 </div>
-                                <div class="flex justify-between text-xs mt-3">
+                                <div class="flex justify-between text-xs mt-2.5">
                                     <span class="text-emerald-400" id="wins-display">0 Wins</span>
                                     <span class="text-red-400" id="losses-count">0 Losses</span>
                                 </div>
@@ -610,61 +1089,123 @@
                         </div>
                        
                         <!-- Avg R:R -->
-                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
+                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-5 border border-zinc-700">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="text-zinc-400 text-sm">Avg R:R</p>
-                                    <p class="text-4xl font-bold mt-2" id="avg-rr">—</p>
+                                    <p class="text-3xl font-bold mt-2" id="avg-rr">—</p>
                                 </div>
-                                <i class="fas fa-balance-scale text-3xl text-sky-500"></i>
+                                <i class="fas fa-balance-scale text-2xl text-sky-500"></i>
                             </div>
-                            <p class="text-zinc-400 text-xs mt-6" id="rr-trades-info">Based on trades with SL &amp; TP</p>
+                            <p class="text-zinc-400 text-xs mt-5" id="rr-trades-info">Based on trades with SL &amp; TP</p>
                         </div>
                        
-                        <!-- Total Trades -->
-                        <div class="bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 border border-zinc-700">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-zinc-400 text-sm">Total Trades</p>
-                                    <p class="text-4xl font-bold mt-2" id="total-trades">0</p>
+                        <!-- Direction Breakdown: Long Wins / Long Losses / Short Wins / Short Losses -->
+                        <div class="lg:col-span-2 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-5 border border-zinc-700">
+                            <p class="text-zinc-400 text-sm mb-4">Direction Breakdown</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-zinc-950/80 rounded-2xl p-3 border border-zinc-800">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="fas fa-arrow-up text-emerald-400 text-xs"></i>
+                                        <span class="text-xs text-zinc-500">Long Wins</span>
+                                    </div>
+                                    <p class="text-xl font-bold text-emerald-400" id="long-wins">0</p>
                                 </div>
-                                <i class="fas fa-exchange-alt text-3xl text-emerald-500"></i>
+                                <div class="bg-zinc-950/80 rounded-2xl p-3 border border-zinc-800">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="fas fa-arrow-up text-red-400 text-xs"></i>
+                                        <span class="text-xs text-zinc-500">Long Losses</span>
+                                    </div>
+                                    <p class="text-xl font-bold text-red-400" id="long-losses">0</p>
+                                </div>
+                                <div class="bg-zinc-950/80 rounded-2xl p-3 border border-zinc-800">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="fas fa-arrow-down text-emerald-400 text-xs"></i>
+                                        <span class="text-xs text-zinc-500">Short Wins</span>
+                                    </div>
+                                    <p class="text-xl font-bold text-emerald-400" id="short-wins">0</p>
+                                </div>
+                                <div class="bg-zinc-950/80 rounded-2xl p-3 border border-zinc-800">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="fas fa-arrow-down text-red-400 text-xs"></i>
+                                        <span class="text-xs text-zinc-500">Short Losses</span>
+                                    </div>
+                                    <p class="text-xl font-bold text-red-400" id="short-losses">0</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                    
-                    <!-- Calendar -->
-                    <div class="mt-8 md:mt-10 bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-zinc-700">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <div>
-                                <h2 class="text-xl font-semibold flex items-center gap-3">
+                    <!-- Premium Calendar Section -->
+                    <div class="mt-8 md:mt-10 calendar-section">
+                        <div class="calendar-header-bar">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                                     <i class="fas fa-calendar-alt"></i>
-                                    Daily P/L Calendar
-                                </h2>
-                                <div id="monthly-total" class="text-sm mt-1 text-zinc-400"></div>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-semibold tracking-tight">Daily Performance Calendar</h2>
+                                    <p class="text-xs text-zinc-500 mt-0.5">Click any day with trades to review</p>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <button onclick="prevMonth()" class="px-4 py-2 hover:bg-zinc-800 rounded-2xl transition">
-                                    <i class="fas fa-chevron-left"></i>
+                            <div class="calendar-nav-group">
+                                <button onclick="prevMonth()" class="cal-nav-btn" title="Previous month">
+                                    <i class="fas fa-chevron-left text-sm"></i>
                                 </button>
-                                <span id="calendar-month" class="font-medium text-lg w-48 text-center"></span>
-                                <button onclick="nextMonth()" class="px-4 py-2 hover:bg-zinc-800 rounded-2xl transition">
-                                    <i class="fas fa-chevron-right"></i>
+                                <span id="calendar-month" class="calendar-month-title"></span>
+                                <button onclick="nextMonth()" class="cal-nav-btn" title="Next month">
+                                    <i class="fas fa-chevron-right text-sm"></i>
                                 </button>
+                                <button onclick="goToToday()" class="cal-today-btn ml-1">Today</button>
                             </div>
                         </div>
-                        
-                        <!-- Weekly P/L -->
-                        <div id="weekly-pl-summary" class="mb-6 p-4 bg-zinc-950 border border-zinc-700 rounded-2xl flex justify-between items-center text-sm">
-                            <div class="flex items-center gap-2">
-                                <span class="text-zinc-400">This Week P/L:</span>
-                                <span id="weekly-pl" class="font-semibold"></span>
+
+                        <!-- Monthly Summary -->
+                        <div class="monthly-summary-row" id="monthly-summary-row">
+                            <div class="monthly-stat-pill">
+                                <span class="label">Monthly P/L</span>
+                                <span class="value" id="monthly-pl-value">+$0.00</span>
                             </div>
-                            <div class="text-xs text-zinc-500">Current balance updated across all views</div>
+                            <div class="monthly-stat-pill">
+                                <span class="label">Trading Days</span>
+                                <span class="value text-zinc-200" id="monthly-trading-days">0</span>
+                            </div>
+                            <div class="monthly-stat-pill">
+                                <span class="label">Win Days</span>
+                                <span class="value text-emerald-400" id="monthly-win-days">0</span>
+                            </div>
+                            <div class="monthly-stat-pill">
+                                <span class="label">Loss Days</span>
+                                <span class="value text-red-400" id="monthly-loss-days">0</span>
+                            </div>
+                            <div class="monthly-stat-pill">
+                                <span class="label">This Week</span>
+                                <span class="value" id="weekly-pl">+$0.00</span>
+                            </div>
                         </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table id="calendar-table" class="calendar-table text-xs min-w-full"></table>
+
+                        <!-- Weekly P/L horizontal scroll -->
+                        <div class="weekly-scroll-container">
+                            <div class="weekly-pl-list" id="weekly-pl-list">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Filters -->
+                        <div class="calendar-filters" id="calendar-filters">
+                            <div class="cal-filter-chip active" data-cal-filter="all" onclick="setCalendarFilter(this)">All</div>
+                            <div class="cal-filter-chip" data-cal-filter="longs" onclick="setCalendarFilter(this)">Longs</div>
+                            <div class="cal-filter-chip" data-cal-filter="shorts" onclick="setCalendarFilter(this)">Shorts</div>
+                            <div class="cal-filter-chip" data-cal-filter="winning" onclick="setCalendarFilter(this)">Winning Days</div>
+                            <div class="cal-filter-chip" data-cal-filter="losing" onclick="setCalendarFilter(this)">Losing Days</div>
+                            <div class="cal-filter-chip" data-cal-filter="notrade" onclick="setCalendarFilter(this)">No-Trade Days</div>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div class="calendar-grid-wrapper">
+                            <div id="calendar-grid" class="calendar-grid">
+                                <!-- Populated by JS -->
+                            </div>
                         </div>
                     </div>
                    
@@ -753,33 +1294,186 @@
                                 </div>
                             </div>
 
-                            <!-- Live P/L Preview -->
                             <div id="pl-preview" class="mt-6 p-4 bg-zinc-950 border border-zinc-700 rounded-2xl hidden">
                                 <div class="flex justify-between items-center">
                                     <span class="text-zinc-400">Estimated P/L</span>
                                     <span id="preview-pl" class="text-2xl font-bold"></span>
                                 </div>
                             </div>
-                           
-                            <div class="mt-8">
-                                <div class="flex items-center justify-between mb-3">
-                                    <label class="block text-zinc-400 text-sm">Trade Reason / Setup <span class="text-emerald-400 text-xs">(Markdown supported)</span></label>
-                                    <div class="flex gap-1">
-                                        <button type="button" onclick="formatText('bold')" class="format-btn px-3 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 rounded-xl flex items-center gap-1">
-                                            <i class="fas fa-bold"></i>
-                                        </button>
-                                        <button type="button" onclick="formatText('italic')" class="format-btn px-3 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 rounded-xl flex items-center gap-1">
-                                            <i class="fas fa-italic"></i>
-                                        </button>
+
+                            <div class="mt-10 section-card rounded-3xl p-6 border border-zinc-700">
+                                <h3 class="text-lg font-semibold mb-1 flex items-center gap-2 text-emerald-400">
+                                    <i class="fas fa-list-check"></i>
+                                    ENTRY REASONING
+                                </h3>
+                                <p class="text-xs text-zinc-500 mb-6">Minimum 1 confluence required — check all that apply</p>
+
+                                <div class="space-y-3">
+                                    <label class="checklist-item flex items-start gap-4 p-4 rounded-2xl border border-zinc-700 cursor-pointer">
+                                        <input type="checkbox" id="check-htf-structure" class="mt-1">
+                                        <span class="text-sm leading-relaxed">Identify the market structure on the higher timeframe</span>
+                                    </label>
+                                    <label class="checklist-item flex items-start gap-4 p-4 rounded-2xl border border-zinc-700 cursor-pointer">
+                                        <input type="checkbox" id="check-inverse-structure" class="mt-1">
+                                        <span class="text-sm leading-relaxed">Identify the inverse market structure within the higher timeframe market structure</span>
+                                    </label>
+                                    <label class="checklist-item flex items-start gap-4 p-4 rounded-2xl border border-zinc-700 cursor-pointer">
+                                        <input type="checkbox" id="check-breakout-zone" class="mt-1">
+                                        <span class="text-sm leading-relaxed">Identify the breakout of the trendline along with the institutional zone or consolidation zone</span>
+                                    </label>
+                                    <label class="checklist-item flex items-start gap-4 p-4 rounded-2xl border border-zinc-700 cursor-pointer">
+                                        <input type="checkbox" id="check-entry-setup" class="mt-1">
+                                        <span class="text-sm leading-relaxed">Entry Setup: Identify the second retest or the immediate support/resistance level formed just before the breakout</span>
+                                    </label>
+                                    <label class="checklist-item flex items-start gap-4 p-4 rounded-2xl border border-zinc-700 cursor-pointer">
+                                        <input type="checkbox" id="check-tp-levels" class="mt-1">
+                                        <span class="text-sm leading-relaxed">Take Profit Levels: Mark all relevant structural take-profit areas</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 section-card rounded-3xl p-6 border border-zinc-700">
+                                <h3 class="text-lg font-semibold mb-6 flex items-center gap-2 text-sky-400">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    EXIT NOTES &amp; LESSONS
+                                </h3>
+
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Was the trade executed according to my trading plan?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="plan-followed" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="plan-followed" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Did I strictly follow my entry, stop-loss, and take-profit rules?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="rules-followed" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="rules-followed" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-2">If not, what did I do differently?</label>
+                                        <textarea id="exit-what-differently" rows="2"
+                                                  class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus text-sm"
+                                                  placeholder="Describe any deviations from the plan..."></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-2">What was the overall market structure?</label>
+                                        <select id="exit-market-structure"
+                                                class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                            <option value="">Select...</option>
+                                            <option value="Bullish">Bullish</option>
+                                            <option value="Bearish">Bearish</option>
+                                            <option value="Ranging">Ranging</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Did I trade in alignment with the prevailing trend?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="trend-aligned" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="trend-aligned" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-2">Primary reason for the trade outcome</label>
+                                        <select id="exit-outcome-reason"
+                                                class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                            <option value="">Select reason...</option>
+                                            <option value="High-probability structural setup">High-probability structural setup</option>
+                                            <option value="Liquidity sweep / stop run">Liquidity sweep / stop run</option>
+                                            <option value="Suboptimal entry timing">Suboptimal entry timing</option>
+                                            <option value="Fundamental / news-driven volatility">Fundamental / news-driven volatility</option>
+                                            <option value="Emotional decision / FOMO">Emotional decision / FOMO</option>
+                                            <option value="Incomplete confluence">Incomplete confluence</option>
+                                            <option value="Risk mismanagement">Risk mismanagement</option>
+                                            <option value="Plan deviation">Plan deviation</option>
+                                            <option value="External market shock">External market shock</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Did I respect my stop-loss?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="respected-sl" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="respected-sl" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Was my position size appropriate?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="size-appropriate" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="size-appropriate" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-3">Did I maintain my planned risk-to-reward ratio?</label>
+                                        <div class="flex gap-3 radio-group">
+                                            <label class="flex-1">
+                                                <input type="radio" name="maintained-rr" value="Yes" class="hidden" checked>
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">Yes</span>
+                                            </label>
+                                            <label class="flex-1">
+                                                <input type="radio" name="maintained-rr" value="No" class="hidden">
+                                                <span class="block text-center py-3 rounded-2xl border border-zinc-700 bg-zinc-800 text-sm font-medium">No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-zinc-400 text-sm mb-2">What was the Take Profit level?</label>
+                                        <select id="exit-tp-level"
+                                                class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 input-focus">
+                                            <option value="">Select...</option>
+                                            <option value="TP1">TP1</option>
+                                            <option value="TP2">TP2</option>
+                                            <option value="TP3">TP3</option>
+                                            <option value="TP4">TP4</option>
+                                            <option value="TP5">TP5</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div id="trade-reason-editor" contenteditable="true"
-                                     class="rich-text-editor w-full bg-zinc-800 border border-zinc-700 rounded-3xl px-5 py-4 focus:outline-none focus:border-emerald-500 input-focus text-zinc-100"
-                                     placeholder="Describe your setup, market structure, bias..."></div>
-                                <input type="hidden" id="trade-reason">
                             </div>
                            
-                            <div class="mt-6">
+                            <div class="mt-8">
                                 <label class="block text-zinc-400 text-sm mb-2">Screenshots / Charts <span class="text-emerald-400 text-xs">(Multiple allowed)</span></label>
                                 <div class="border border-dashed border-zinc-700 rounded-3xl p-8 text-center hover:border-emerald-500 transition-colors">
                                     <input type="file" id="trade-screenshots" accept="image/*" multiple class="hidden" onchange="previewMultipleImages(event)">
@@ -807,20 +1501,18 @@
                     </div>
                 </div>
                
-                <!-- Enhanced Journal Content -->
+                <!-- Journal Content -->
                 <div id="journal-content" class="hidden">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
-                        <!-- Search and Filters -->
                         <div class="flex flex-wrap gap-3 items-center">
                             <div class="relative flex-1 min-w-[240px]">
                                 <input type="text" id="search-input"
                                        onkeyup="filterTrades()"
-                                       placeholder="Search pairs, notes..."
+                                       placeholder="Search pairs..."
                                        class="bg-zinc-900 border border-zinc-700 rounded-3xl px-6 py-4 w-full focus:outline-none focus:border-emerald-500 input-focus">
                                 <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
                             </div>
                             
-                            <!-- Quick Filters -->
                             <div onclick="toggleFilter(this)" data-filter="all" class="filter-chip active px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm cursor-pointer flex items-center gap-2">
                                 <i class="fas fa-list"></i>
                                 <span>All</span>
@@ -865,7 +1557,6 @@
                         </div>
                     </div>
 
-                    <!-- Pagination -->
                     <div id="pagination" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 px-2 text-sm">
                         <div class="text-zinc-400" id="page-info">Showing 1-10 of 0</div>
                         <div class="flex gap-2">
@@ -877,10 +1568,9 @@
                     </div>
                 </div>
                
-                <!-- Professional Analytics Content -->
+                <!-- Analytics Content -->
                 <div id="analytics-content" class="hidden">
                     <div class="space-y-8">
-                        <!-- Professional Summary Stats -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div class="metric-card rounded-3xl p-6 border border-zinc-700">
                                 <div class="flex items-center justify-between">
@@ -914,26 +1604,18 @@
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Enhanced Equity Curve -->
                             <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
                                 <div class="flex justify-between items-center mb-6">
                                     <h3 class="text-lg font-semibold flex items-center gap-2">
                                         <i class="fas fa-chart-line"></i>
                                         Equity Curve
                                     </h3>
-                                    <div class="text-xs text-zinc-500 flex items-center gap-4">
-                                        <div class="flex items-center gap-1">
-                                            <div class="w-3 h-px bg-emerald-500"></div>
-                                            <span>Equity</span>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="chart-container" style="height: 320px;">
                                     <canvas id="equityChart"></canvas>
                                 </div>
                             </div>
                             
-                            <!-- Enhanced Monthly Performance -->
                             <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
                                 <div class="flex justify-between items-center mb-6">
                                     <h3 class="text-lg font-semibold flex items-center gap-2">
@@ -951,7 +1633,6 @@
                             </div>
                         </div>
 
-                        <!-- Pair Performance -->
                         <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
                             <h3 class="text-lg font-semibold mb-6">Instrument Performance</h3>
                             <div class="flex justify-center mb-8">
@@ -995,6 +1676,27 @@
             <div class="p-6 border-t border-zinc-800 flex justify-end gap-4">
                 <button onclick="closeModal()"
                         class="px-8 py-3 border border-zinc-700 rounded-2xl hover:bg-zinc-800">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Trades Modal -->
+    <div id="day-trades-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="modal bg-zinc-900 rounded-3xl w-full max-w-lg mx-auto max-h-[88vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-zinc-800 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold" id="day-modal-title">Trades</h3>
+                    <p class="text-sm text-zinc-500 mt-0.5" id="day-modal-subtitle"></p>
+                </div>
+                <button onclick="closeDayTradesModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-5 overflow-auto flex-1" id="day-modal-content">
+                <!-- Populated by JS -->
+            </div>
+            <div class="p-5 border-t border-zinc-800 flex justify-end">
+                <button onclick="closeDayTradesModal()" class="px-6 py-2.5 border border-zinc-700 rounded-2xl hover:bg-zinc-800 text-sm">
                     Close
                 </button>
             </div>
@@ -1081,13 +1783,12 @@
         </div>
     </div>
 
-    <!-- Lightbox for screenshots -->
+    <!-- Lightbox -->
     <div id="lightbox" onclick="this.style.display='none'">
         <img id="lightbox-image" src="" alt="Screenshot" onclick="event.stopImmediatePropagation()">
     </div>
 
     <script>
-        // Simple SHA-256 like hash for demo
         function simpleHash(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -1107,14 +1808,13 @@
         let monthlyChartInstance = null;
         let currentCalendarDate = new Date();
         let currentScreenshots = [];
+        let calendarFilter = 'all';
 
-        // Journal enhancements
         let currentSort = { column: 1, direction: 'desc' };
         let currentFilter = 'all';
         let currentPage = 1;
         const PAGE_SIZE = 15;
 
-        // Users storage
         function getUsers() {
             const users = localStorage.getItem('xaffordsfx_users');
             return users ? JSON.parse(users) : [];
@@ -1129,7 +1829,6 @@
             if (data) {
                 return JSON.parse(data);
             }
-            // Default account
             return [{
                 id: 'acc_main',
                 name: 'Main Account',
@@ -1151,7 +1850,6 @@
             localStorage.setItem(`xaffordsfx_current_account_${currentUser.username}`, id);
         }
 
-        // Enhanced Signup validations
         let usernameAvailable = false;
         let passwordStrength = 0;
 
@@ -1197,22 +1895,11 @@
             
             passwordStrength = strength;
             
-            if (strength === 0) {
-                color = 'bg-red-500';
-                label = 'Very Weak';
-            } else if (strength === 1) {
-                color = 'bg-red-500';
-                label = 'Weak';
-            } else if (strength === 2) {
-                color = 'bg-yellow-500';
-                label = 'Medium';
-            } else if (strength === 3) {
-                color = 'bg-emerald-500';
-                label = 'Strong';
-            } else {
-                color = 'bg-emerald-500';
-                label = 'Very Strong';
-            }
+            if (strength === 0) { color = 'bg-red-500'; label = 'Very Weak'; }
+            else if (strength === 1) { color = 'bg-red-500'; label = 'Weak'; }
+            else if (strength === 2) { color = 'bg-yellow-500'; label = 'Medium'; }
+            else if (strength === 3) { color = 'bg-emerald-500'; label = 'Strong'; }
+            else { color = 'bg-emerald-500'; label = 'Very Strong'; }
             
             bar.style.width = `${(strength / 4) * 100}%`;
             bar.className = `strength-bar ${color}`;
@@ -1307,7 +1994,6 @@
             showLogin();
             document.getElementById('login-username').value = username;
             
-            // Reset form
             document.getElementById('signup-username').value = '';
             document.getElementById('signup-email').value = '';
             document.getElementById('signup-password').value = '';
@@ -1344,7 +2030,6 @@
             currentUser = user;
             localStorage.setItem('xaffordsfx_current_user', JSON.stringify(currentUser));
             
-            // Load accounts
             accounts = getUserAccounts(currentUser.username);
             currentAccountId = localStorage.getItem(`xaffordsfx_current_account_${currentUser.username}`) || accounts[0].id;
             
@@ -1409,6 +2094,9 @@
            
             document.getElementById(`nav-${page}`).classList.add('active');
            
+            const contentArea = document.getElementById('content-area');
+            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+           
             if (page === 0) {
                 document.getElementById('dashboard-content').classList.remove('hidden');
                 document.getElementById('page-title').textContent = 'Dashboard';
@@ -1439,7 +2127,24 @@
             document.getElementById('form-title').innerHTML = `<i class="fas fa-plus"></i> Log New Trade`;
             document.getElementById('save-btn').textContent = 'Save Trade';
             document.getElementById('pl-preview').classList.add('hidden');
-            document.getElementById('trade-reason-editor').innerHTML = '';
+            
+            document.getElementById('check-htf-structure').checked = false;
+            document.getElementById('check-inverse-structure').checked = false;
+            document.getElementById('check-breakout-zone').checked = false;
+            document.getElementById('check-entry-setup').checked = false;
+            document.getElementById('check-tp-levels').checked = false;
+            
+            document.getElementById('exit-what-differently').value = '';
+            document.getElementById('exit-market-structure').value = '';
+            document.getElementById('exit-outcome-reason').value = '';
+            document.getElementById('exit-tp-level').value = '';
+            
+            document.querySelectorAll('input[name="plan-followed"][value="Yes"]').forEach(r => r.checked = true);
+            document.querySelectorAll('input[name="rules-followed"][value="Yes"]').forEach(r => r.checked = true);
+            document.querySelectorAll('input[name="trend-aligned"][value="Yes"]').forEach(r => r.checked = true);
+            document.querySelectorAll('input[name="respected-sl"][value="Yes"]').forEach(r => r.checked = true);
+            document.querySelectorAll('input[name="size-appropriate"][value="Yes"]').forEach(r => r.checked = true);
+            document.querySelectorAll('input[name="maintained-rr"][value="Yes"]').forEach(r => r.checked = true);
             
             const now = new Date();
             const localDate = now.toISOString().slice(0,16);
@@ -1485,18 +2190,7 @@
             document.getElementById('lightbox-image').src = src;
             document.getElementById('lightbox').style.display = 'flex';
         }
-       
-        function renderMarkdown(text) {
-            if (!text) return '';
-            let html = text
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-                .replace(/\n/g, '<br>');
-            return html;
-        }
 
-        // === ENHANCED PIP & LOT CALCULATION ===
         function getPipMultiplier(pair) {
             if (!pair) return 100000;
             const p = pair.toUpperCase().trim();
@@ -1505,39 +2199,22 @@
                 return 100000;
             }
             
-            if (p.endsWith('JPY')) {
-                return 1000;
-            }
-            
-            if (p === 'XAUUSD' || p === 'GOLD') {
-                return 100;
-            }
-            if (p === 'XAGUSD' || p === 'SILVER') {
-                return 5000;
-            }
-            
-            if (p === 'BTCUSD' || p === 'BTCUSDT') {
-                return 1;
-            }
-            if (p === 'ETHUSD' || p === 'ETHUSDT') {
-                return 1;
-            }
-            
-            if (['US30', 'DOW', 'DJI'].includes(p)) {
-                return 1;
-            }
-            if (['SPX500', 'SPX', 'NAS100', 'NASDAQ'].includes(p)) {
-                return 1;
-            }
-            if (['GER40', 'DAX', 'UK100'].includes(p)) {
-                return 1;
-            }
-            
-            if (p.includes('OIL') || p.includes('WTI') || p.includes('BRENT') || p === 'USOIL' || p === 'UKOIL') {
-                return 1000;
-            }
+            if (p.endsWith('JPY')) return 1000;
+            if (p === 'XAUUSD' || p === 'GOLD') return 100;
+            if (p === 'XAGUSD' || p === 'SILVER') return 5000;
+            if (p === 'BTCUSD' || p === 'BTCUSDT') return 1;
+            if (p === 'ETHUSD' || p === 'ETHUSDT') return 1;
+            if (['US30', 'DOW', 'DJI'].includes(p)) return 1;
+            if (['SPX500', 'SPX', 'NAS100', 'NASDAQ'].includes(p)) return 1;
+            if (['GER40', 'DAX', 'UK100'].includes(p)) return 1;
+            if (p.includes('OIL') || p.includes('WTI') || p.includes('BRENT') || p === 'USOIL' || p === 'UKOIL') return 1000;
             
             return 100000;
+        }
+
+        function getRadioValue(name) {
+            const el = document.querySelector(`input[name="${name}"]:checked`);
+            return el ? el.value : '';
         }
 
         function saveTrade(e) {
@@ -1558,12 +2235,21 @@
                 alert("Entry and Exit prices are required");
                 return;
             }
+
+            const checks = [
+                document.getElementById('check-htf-structure').checked,
+                document.getElementById('check-inverse-structure').checked,
+                document.getElementById('check-breakout-zone').checked,
+                document.getElementById('check-entry-setup').checked,
+                document.getElementById('check-tp-levels').checked
+            ];
+            if (!checks.some(c => c)) {
+                alert("Please select at least one Entry Reasoning confluence.");
+                return;
+            }
            
             const priceDiff = direction === 'Buy' ? (exit - entry) : (entry - exit);
             const multiplier = getPipMultiplier(pair);
-           
-            const reasonHTML = document.getElementById('trade-reason-editor').innerHTML;
-            const reasonText = document.getElementById('trade-reason-editor').innerText.trim();
             
             const newTrade = {
                 id: Date.now(),
@@ -1575,11 +2261,30 @@
                 sl: parseFloat(document.getElementById('stop-loss').value) || null,
                 tp: parseFloat(document.getElementById('take-profit').value) || null,
                 lots: lots,
-                reason: reasonText,
-                reasonHTML: reasonHTML,
                 screenshots: [...currentScreenshots],
                 timestamp: new Date().toISOString(),
-                multiplier: multiplier
+                multiplier: multiplier,
+                
+                entryReasoning: {
+                    htfStructure: document.getElementById('check-htf-structure').checked,
+                    inverseStructure: document.getElementById('check-inverse-structure').checked,
+                    breakoutZone: document.getElementById('check-breakout-zone').checked,
+                    entrySetup: document.getElementById('check-entry-setup').checked,
+                    tpLevels: document.getElementById('check-tp-levels').checked
+                },
+                
+                exitNotes: {
+                    planFollowed: getRadioValue('plan-followed'),
+                    rulesFollowed: getRadioValue('rules-followed'),
+                    whatDifferently: document.getElementById('exit-what-differently').value.trim(),
+                    marketStructure: document.getElementById('exit-market-structure').value,
+                    trendAligned: getRadioValue('trend-aligned'),
+                    outcomeReason: document.getElementById('exit-outcome-reason').value,
+                    respectedSL: getRadioValue('respected-sl'),
+                    sizeAppropriate: getRadioValue('size-appropriate'),
+                    maintainedRR: getRadioValue('maintained-rr'),
+                    tpLevel: document.getElementById('exit-tp-level').value
+                }
             };
            
             newTrade.pl = priceDiff * lots * multiplier;
@@ -1636,24 +2341,53 @@
             });
             return { avg: count ? (totalRR / count) : 0, count: count };
         }
+
+        function calculateDirectionStats(account) {
+            let longWins = 0, longLosses = 0, shortWins = 0, shortLosses = 0;
+            account.trades.forEach(t => {
+                if (t.direction === 'Buy') {
+                    if (t.pl > 0) longWins++;
+                    else if (t.pl < 0) longLosses++;
+                } else {
+                    if (t.pl > 0) shortWins++;
+                    else if (t.pl < 0) shortLosses++;
+                }
+            });
+            return { longWins, longLosses, shortWins, shortLosses };
+        }
        
-        function getDailyPL(account) {
+        function getDailyStats(account) {
             const daily = {};
             account.trades.forEach(trade => {
                 if (!trade.date) return;
                 const d = new Date(trade.date);
                 const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                if (!daily[key]) daily[key] = 0;
-                daily[key] += (trade.pl || 0);
+                if (!daily[key]) {
+                    daily[key] = {
+                        pl: 0,
+                        count: 0,
+                        longs: 0,
+                        shorts: 0,
+                        wins: 0,
+                        losses: 0,
+                        trades: []
+                    };
+                }
+                daily[key].pl += (trade.pl || 0);
+                daily[key].count++;
+                if (trade.direction === 'Buy') daily[key].longs++;
+                else daily[key].shorts++;
+                if (trade.pl > 0) daily[key].wins++;
+                else if (trade.pl < 0) daily[key].losses++;
+                daily[key].trades.push(trade);
             });
             return daily;
         }
 
-        // NEW: Weekly P/L calculation
         function getWeeklyPL(account) {
             const now = new Date();
             const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday start
+            startOfWeek.setDate(now.getDate() - now.getDay());
             startOfWeek.setHours(0, 0, 0, 0);
             
             let weeklyPL = 0;
@@ -1669,6 +2403,17 @@
             return weeklyPL;
         }
 
+        function formatPLShort(val) {
+            const abs = Math.abs(val);
+            if (abs >= 1000) return (val >= 0 ? '+' : '-') + '$' + (abs / 1000).toFixed(1) + 'k';
+            return (val >= 0 ? '+' : '') + '$' + val.toFixed(0);
+        }
+
+        function formatPLFull(val) {
+            return (val >= 0 ? '+' : '') + '$' + val.toFixed(2);
+        }
+
+        // ========== PREMIUM CALENDAR ==========
         function renderCalendar() {
             const account = getCurrentAccount();
             const year = currentCalendarDate.getFullYear();
@@ -1677,74 +2422,218 @@
             document.getElementById('calendar-month').textContent = 
                 currentCalendarDate.toLocaleString('default', { month: 'long', year: 'numeric' });
            
-            const dailyPL = getDailyPL(account);
-            const monthlyPL = Object.values(dailyPL).reduce((a, b) => a + b, 0);
-            const monthlyEl = document.getElementById('monthly-total');
-            monthlyEl.innerHTML = `
-                <span class="${monthlyPL >= 0 ? 'text-emerald-400' : 'text-red-400'} font-medium">
-                    Monthly P/L: ${monthlyPL >= 0 ? '+' : ''}$${monthlyPL.toFixed(2)}
-                </span>
-            `;
+            const dailyStats = getDailyStats(account);
             
-            // Weekly PL
+            // Monthly aggregates
+            let monthlyPL = 0;
+            let tradingDays = 0;
+            let winDays = 0;
+            let lossDays = 0;
+            const monthPrefix = `${year}-${String(month+1).padStart(2,'0')}`;
+            
+            Object.keys(dailyStats).forEach(key => {
+                if (key.startsWith(monthPrefix)) {
+                    const s = dailyStats[key];
+                    monthlyPL += s.pl;
+                    if (s.count > 0) {
+                        tradingDays++;
+                        if (s.pl > 0) winDays++;
+                        else if (s.pl < 0) lossDays++;
+                    }
+                }
+            });
+            
+            const monthlyPLEl = document.getElementById('monthly-pl-value');
+            monthlyPLEl.textContent = formatPLFull(monthlyPL);
+            monthlyPLEl.className = 'value ' + (monthlyPL >= 0 ? 'text-emerald-400' : 'text-red-400');
+            
+            document.getElementById('monthly-trading-days').textContent = tradingDays;
+            document.getElementById('monthly-win-days').textContent = winDays;
+            document.getElementById('monthly-loss-days').textContent = lossDays;
+            
             const weeklyPL = getWeeklyPL(account);
             const weeklyEl = document.getElementById('weekly-pl');
-            weeklyEl.textContent = `${weeklyPL >= 0 ? '+' : ''}$${weeklyPL.toFixed(2)}`;
-            weeklyEl.className = weeklyPL >= 0 ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold';
+            weeklyEl.textContent = formatPLFull(weeklyPL);
+            weeklyEl.className = 'value ' + (weeklyPL >= 0 ? 'text-emerald-400' : 'text-red-400');
+           
+            // Weekly chips for the visible month
+            renderWeeklyChips(year, month, dailyStats);
+           
+            // Max abs PL for heatmap (current month)
+            let maxAbsPL = 0;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const v = Math.abs((dailyStats[key] && dailyStats[key].pl) || 0);
+                if (v > maxAbsPL) maxAbsPL = v;
+            }
            
             const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const grid = document.getElementById('calendar-grid');
+            let html = '';
            
-            let html = `<thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody>`;
+            // Weekday headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(d => {
+                html += `<div class="calendar-weekday">${d}</div>`;
+            });
            
-            let day = 1;
-            let row = '<tr>';
+            // Leading empties
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div class="calendar-day empty"></div>`;
+            }
            
-            for (let i = 0; i < firstDay; i++) row += '<td></td>';
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
            
-            for (let i = firstDay; i < 7 && day <= daysInMonth; i++) {
-                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                const pl = dailyPL[dateKey] || 0;
-                const isToday = (new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year);
-               
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const stats = dailyStats[dateKey] || { pl: 0, count: 0, longs: 0, shorts: 0, wins: 0, losses: 0, trades: [] };
+                const isToday = isCurrentMonth && today.getDate() === d;
+                
                 let cellClass = 'calendar-day';
                 if (isToday) cellClass += ' today';
-                if (pl !== 0) cellClass += ' has-trades';
-               
-                let plHTML = pl !== 0 ? `<div class="calendar-pl ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</div>` : '';
-               
-                row += `<td class="${cellClass}"><div class="calendar-day-number">${day}</div>${plHTML}</td>`;
-                day++;
-            }
-            row += '</tr>';
-            html += row;
-           
-            while (day <= daysInMonth) {
-                row = '<tr>';
-                for (let i = 0; i < 7; i++) {
-                    if (day > daysInMonth) {
-                        row += '<td></td>';
-                        continue;
-                    }
-                    const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                    const pl = dailyPL[dateKey] || 0;
-                    const isToday = (new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year);
-                   
-                    let cellClass = 'calendar-day';
-                    if (isToday) cellClass += ' today';
-                    if (pl !== 0) cellClass += ' has-trades';
-                   
-                    let plHTML = pl !== 0 ? `<div class="calendar-pl ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</div>` : '';
-                   
-                    row += `<td class="${cellClass}"><div class="calendar-day-number">${day}</div>${plHTML}</td>`;
-                    day++;
+                if (stats.count > 0) cellClass += ' has-trades';
+                
+                // Heatmap
+                if (maxAbsPL > 0 && stats.pl !== 0) {
+                    const ratio = Math.abs(stats.pl) / maxAbsPL;
+                    let level = 1;
+                    if (ratio >= 0.75) level = 4;
+                    else if (ratio >= 0.5) level = 3;
+                    else if (ratio >= 0.25) level = 2;
+                    cellClass += stats.pl > 0 ? ` heat-profit-${level}` : ` heat-loss-${level}`;
+                } else if (stats.count > 0 && stats.pl === 0) {
+                    cellClass += ' heat-breakeven';
                 }
-                row += '</tr>';
-                html += row;
+                
+                // Filter matching
+                const passesFilter = dayPassesFilter(stats);
+                if (!passesFilter) cellClass += ' filtered-out';
+                
+                const winRate = stats.count > 0 ? ((stats.wins / stats.count) * 100).toFixed(0) : '—';
+                
+                let plHTML = '';
+                if (stats.count > 0) {
+                    const plClass = stats.pl > 0 ? 'profit' : (stats.pl < 0 ? 'loss' : 'zero');
+                    plHTML = `<div class="day-pl ${plClass}">${formatPLShort(stats.pl)}</div>`;
+                }
+                
+                let metaHTML = '';
+                if (stats.count > 0) {
+                    metaHTML = `
+                        <div class="day-meta">
+                            <div class="day-meta-row">
+                                <span class="meta-label">Trades</span>
+                                <span class="meta-value">${stats.count}</span>
+                            </div>
+                            <div class="day-meta-row">
+                                <span class="meta-label">L / S</span>
+                                <span class="meta-value"><span class="longs">${stats.longs}</span> / <span class="shorts">${stats.shorts}</span></span>
+                            </div>
+                            <div class="day-meta-row">
+                                <span class="meta-label">Win%</span>
+                                <span class="meta-value winrate">${winRate}%</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    metaHTML = `<div class="day-empty-state">—</div>`;
+                }
+                
+                // Tooltip
+                let tipHTML = '';
+                if (stats.count > 0) {
+                    tipHTML = `
+                        <div class="day-tooltip">
+                            <div class="tip-title">${d} ${currentCalendarDate.toLocaleString('default', { month: 'short' })}</div>
+                            <div class="tip-row"><span>P/L</span><span class="${stats.pl >= 0 ? 'text-emerald-400' : 'text-red-400'}">${formatPLFull(stats.pl)}</span></div>
+                            <div class="tip-row"><span>Trades</span><span>${stats.count}</span></div>
+                            <div class="tip-row"><span>Longs</span><span class="text-emerald-400">${stats.longs}</span></div>
+                            <div class="tip-row"><span>Shorts</span><span class="text-red-400">${stats.shorts}</span></div>
+                            <div class="tip-row"><span>Wins / Losses</span><span>${stats.wins} / ${stats.losses}</span></div>
+                            <div class="tip-row"><span>Win Rate</span><span>${winRate}%</span></div>
+                        </div>
+                    `;
+                }
+                
+                const clickAttr = stats.count > 0 ? `onclick="openDayTrades('${dateKey}')"` : '';
+                
+                html += `
+                    <div class="${cellClass}" ${clickAttr} data-date="${dateKey}">
+                        <div class="day-number">${d}</div>
+                        ${plHTML}
+                        ${metaHTML}
+                        ${tipHTML}
+                    </div>
+                `;
             }
            
-            html += '</tbody>';
-            document.getElementById('calendar-table').innerHTML = html;
+            // Trailing empties to complete the grid
+            const totalCells = firstDay + daysInMonth;
+            const trailing = (7 - (totalCells % 7)) % 7;
+            for (let i = 0; i < trailing; i++) {
+                html += `<div class="calendar-day empty"></div>`;
+            }
+           
+            grid.innerHTML = html;
+        }
+
+        function dayPassesFilter(stats) {
+            switch (calendarFilter) {
+                case 'longs': return stats.longs > 0;
+                case 'shorts': return stats.shorts > 0;
+                case 'winning': return stats.pl > 0;
+                case 'losing': return stats.pl < 0;
+                case 'notrade': return stats.count === 0;
+                default: return true;
+            }
+        }
+
+        function setCalendarFilter(el) {
+            document.querySelectorAll('.cal-filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            calendarFilter = el.dataset.calFilter;
+            renderCalendar();
+        }
+
+        function renderWeeklyChips(year, month, dailyStats) {
+            const container = document.getElementById('weekly-pl-list');
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            
+            // Build weeks of the month
+            const weeks = [];
+            let currentWeek = { start: 1, pl: 0, days: 0 };
+            let dayOfWeek = firstDay;
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const s = dailyStats[key];
+                if (s) currentWeek.pl += s.pl;
+                currentWeek.days++;
+                
+                if (dayOfWeek === 6 || d === daysInMonth) {
+                    currentWeek.end = d;
+                    weeks.push({ ...currentWeek });
+                    currentWeek = { start: d + 1, pl: 0, days: 0 };
+                }
+                dayOfWeek = (dayOfWeek + 1) % 7;
+            }
+            
+            let html = '';
+            weeks.forEach((w, idx) => {
+                const cls = w.pl > 0 ? 'profit' : (w.pl < 0 ? 'loss' : 'neutral');
+                const label = `W${idx + 1}`;
+                const range = w.start === w.end ? `${w.start}` : `${w.start}–${w.end}`;
+                html += `
+                    <div class="week-chip ${cls}">
+                        <div class="week-label">${label} · ${range}</div>
+                        <div class="week-value">${w.pl !== 0 ? formatPLShort(w.pl) : '—'}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html || '<div class="text-zinc-500 text-sm py-2">No weekly data</div>';
         }
        
         function prevMonth() {
@@ -1755,6 +2644,54 @@
         function nextMonth() {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
             renderCalendar();
+        }
+
+        function goToToday() {
+            currentCalendarDate = new Date();
+            renderCalendar();
+        }
+
+        function openDayTrades(dateKey) {
+            const account = getCurrentAccount();
+            const dailyStats = getDailyStats(account);
+            const stats = dailyStats[dateKey];
+            if (!stats || !stats.trades || stats.trades.length === 0) return;
+            
+            const [y, m, d] = dateKey.split('-').map(Number);
+            const dateObj = new Date(y, m - 1, d);
+            const titleDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('day-modal-title').textContent = titleDate;
+            document.getElementById('day-modal-subtitle').textContent = 
+                `${stats.count} trade${stats.count > 1 ? 's' : ''} · P/L ${formatPLFull(stats.pl)} · ${stats.longs}L / ${stats.shorts}S`;
+            
+            const content = document.getElementById('day-modal-content');
+            let html = '<div class="day-trades-list">';
+            
+            stats.trades.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(trade => {
+                html += `
+                    <div class="day-trade-item" onclick="closeDayTradesModal(); showTradeDetail(${JSON.stringify(trade).replace(/"/g, '&quot;')})">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="font-mono font-semibold text-base">${trade.pair}</span>
+                            <span class="px-2.5 py-0.5 text-xs rounded-full ${trade.direction === 'Buy' ? 'bg-emerald-900/60 text-emerald-400' : 'bg-red-900/60 text-red-400'}">
+                                ${trade.direction}
+                            </span>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="font-semibold ${trade.pl >= 0 ? 'profit' : 'loss'}">${formatPLFull(trade.pl || 0)}</div>
+                            <div class="text-xs text-zinc-500 font-mono">${trade.entry} → ${trade.exit}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+            document.getElementById('day-trades-modal').classList.remove('hidden');
+        }
+
+        function closeDayTradesModal() {
+            document.getElementById('day-trades-modal').classList.add('hidden');
         }
        
         function renderDashboard() {
@@ -1775,7 +2712,12 @@
             document.getElementById('total-pl-display').textContent = (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(2);
             document.getElementById('total-pl-display').className = totalPL >= 0 ? "font-medium text-emerald-500" : "font-medium text-red-500";
            
-            document.getElementById('total-trades').textContent = account.trades.length;
+            // Direction breakdown
+            const dirStats = calculateDirectionStats(account);
+            document.getElementById('long-wins').textContent = dirStats.longWins;
+            document.getElementById('long-losses').textContent = dirStats.longLosses;
+            document.getElementById('short-wins').textContent = dirStats.shortWins;
+            document.getElementById('short-losses').textContent = dirStats.shortLosses;
            
             const winRate = calculateWinRate(account);
             const trades = account.trades;
@@ -1830,7 +2772,6 @@
             renderCalendar();
         }
 
-        // Enhanced Journal with proper running balance (full chronological)
         function renderJournal() {
             const account = getCurrentAccount();
             const tbody = document.getElementById('journal-table');
@@ -1846,20 +2787,15 @@
             
             const query = document.getElementById('search-input').value.toLowerCase();
             if (query) {
-                filteredTrades = filteredTrades.filter(t => 
-                    t.pair.toLowerCase().includes(query) || 
-                    (t.reason && t.reason.toLowerCase().includes(query))
-                );
+                filteredTrades = filteredTrades.filter(t => t.pair.toLowerCase().includes(query));
             }
             
-            // Sort for display (newest first by default)
             filteredTrades.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             const totalPages = Math.ceil(filteredTrades.length / PAGE_SIZE) || 1;
             const start = (currentPage - 1) * PAGE_SIZE;
             const paginatedTrades = filteredTrades.slice(start, start + PAGE_SIZE);
             
-            // For accurate running balance: compute cumulative from ALL trades chronologically
             const allTradesSorted = [...account.trades].sort((a, b) => new Date(a.date) - new Date(b.date));
             let globalRunning = account.startingBalance;
             const tradeBalanceMap = new Map();
@@ -2036,7 +2972,6 @@
             const expectancy = trades.length ? totalPL / trades.length : 0;
             document.getElementById('analytics-expectancy').textContent = (expectancy >= 0 ? '+' : '') + '$' + expectancy.toFixed(2);
             
-            // Enhanced Equity Curve
             const ctxEquity = document.getElementById('equityChart');
             if (equityChartInstance) equityChartInstance.destroy();
            
@@ -2071,10 +3006,7 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
+                    interaction: { intersect: false, mode: 'index' },
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
@@ -2082,31 +3014,16 @@
                             titleColor: '#a1a1aa',
                             bodyColor: '#00ff9d',
                             displayColors: false,
-                            callbacks: {
-                                label: (ctx) => '$' + ctx.raw.toFixed(2)
-                            }
+                            callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) }
                         }
                     },
                     scales: {
-                        y: { 
-                            grid: { color: '#27272a' }, 
-                            ticks: { color: '#a1a1aa', font: { size: 11 } },
-                            border: { dash: [2, 2] }
-                        },
-                        x: { 
-                            grid: { color: '#27272a' }, 
-                            ticks: { color: '#a1a1aa', font: { size: 11 }, maxRotation: 45 }
-                        }
-                    },
-                    elements: {
-                        line: {
-                            borderJoinStyle: 'round'
-                        }
+                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 11 } }, border: { dash: [2, 2] } },
+                        x: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 11 }, maxRotation: 45 } }
                     }
                 }
             });
            
-            // Enhanced Monthly Performance
             const monthlyPLMap = {};
             sorted.forEach(t => {
                 const m = new Date(t.date).toISOString().slice(0,7);
@@ -2140,26 +3057,15 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => '$' + ctx.raw.toFixed(2)
-                            }
-                        }
+                        tooltip: { callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) } }
                     },
                     scales: {
-                        y: { 
-                            grid: { color: '#27272a' },
-                            ticks: { color: '#a1a1aa' }
-                        },
-                        x: { 
-                            grid: { color: '#27272a' },
-                            ticks: { color: '#a1a1aa' }
-                        }
+                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } },
+                        x: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } }
                     }
                 }
             });
            
-            // Pie Chart
             const pairCount = {};
             trades.forEach(trade => {
                 pairCount[trade.pair] = (pairCount[trade.pair] || 0) + 1;
@@ -2187,15 +3093,11 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: { 
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { color: '#d1d5db', padding: 18, font: { size: 13 } } 
-                        }
+                        legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 18, font: { size: 13 } } }
                     }
                 }
             });
            
-            // Pair performance table
             const tbody = document.getElementById('pair-tbody');
             tbody.innerHTML = '';
            
@@ -2226,6 +3128,11 @@
         }
        
         function showTradeDetail(trade) {
+            // Support both object and stringified (from day modal)
+            if (typeof trade === 'string') {
+                try { trade = JSON.parse(trade); } catch(e) { return; }
+            }
+            
             const modal = document.getElementById('trade-modal');
             const content = document.getElementById('modal-content');
            
@@ -2244,10 +3151,62 @@
                     </div>
                 `;
             }
-           
-            const notesHTML = trade.reasonHTML 
-                ? `<div class="notes-content bg-zinc-800 rounded-3xl p-6">${trade.reasonHTML}</div>` 
-                : (trade.reason ? `<div class="notes-content bg-zinc-800 rounded-3xl p-6">${renderMarkdown(trade.reason)}</div>` : '');
+            
+            let entryReasoningHTML = '';
+            if (trade.entryReasoning) {
+                const er = trade.entryReasoning;
+                const items = [
+                    { key: 'htfStructure', label: 'Higher timeframe market structure identified' },
+                    { key: 'inverseStructure', label: 'Inverse market structure identified' },
+                    { key: 'breakoutZone', label: 'Trendline breakout + institutional/consolidation zone' },
+                    { key: 'entrySetup', label: 'Second retest / immediate S/R before breakout' },
+                    { key: 'tpLevels', label: 'Structural take-profit areas marked' }
+                ];
+                const checked = items.filter(i => er[i.key]);
+                if (checked.length > 0) {
+                    entryReasoningHTML = `
+                        <div class="mt-10">
+                            <div class="text-emerald-400 text-sm mb-4 flex items-center gap-2 font-semibold">
+                                <i class="fas fa-list-check"></i>
+                                Entry Reasoning (${checked.length} confluence${checked.length > 1 ? 's' : ''})
+                            </div>
+                            <div class="space-y-2 bg-zinc-800/60 rounded-3xl p-5 border border-zinc-700">
+                                ${checked.map(i => `
+                                    <div class="flex items-center gap-3 text-sm">
+                                        <i class="fas fa-check text-emerald-400"></i>
+                                        <span>${i.label}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            let exitNotesHTML = '';
+            if (trade.exitNotes) {
+                const en = trade.exitNotes;
+                exitNotesHTML = `
+                    <div class="mt-10">
+                        <div class="text-sky-400 text-sm mb-4 flex items-center gap-2 font-semibold">
+                            <i class="fas fa-clipboard-check"></i>
+                            Exit Notes &amp; Lessons
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-800/60 rounded-3xl p-5 border border-zinc-700 text-sm">
+                            <div><span class="text-zinc-500">Plan followed:</span> <span class="font-medium ${en.planFollowed === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.planFollowed || '—'}</span></div>
+                            <div><span class="text-zinc-500">Rules followed:</span> <span class="font-medium ${en.rulesFollowed === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.rulesFollowed || '—'}</span></div>
+                            <div><span class="text-zinc-500">Trend aligned:</span> <span class="font-medium ${en.trendAligned === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.trendAligned || '—'}</span></div>
+                            <div><span class="text-zinc-500">Respected SL:</span> <span class="font-medium ${en.respectedSL === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.respectedSL || '—'}</span></div>
+                            <div><span class="text-zinc-500">Size appropriate:</span> <span class="font-medium ${en.sizeAppropriate === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.sizeAppropriate || '—'}</span></div>
+                            <div><span class="text-zinc-500">Maintained R:R:</span> <span class="font-medium ${en.maintainedRR === 'Yes' ? 'text-emerald-400' : 'text-red-400'}">${en.maintainedRR || '—'}</span></div>
+                            <div><span class="text-zinc-500">Market Structure:</span> <span class="font-medium">${en.marketStructure || '—'}</span></div>
+                            <div><span class="text-zinc-500">Outcome Reason:</span> <span class="font-medium">${en.outcomeReason || '—'}</span></div>
+                            <div><span class="text-zinc-500">TP Level:</span> <span class="font-medium">${en.tpLevel || '—'}</span></div>
+                            ${en.whatDifferently ? `<div class="sm:col-span-2"><span class="text-zinc-500">What I did differently:</span><div class="mt-1 text-zinc-200">${en.whatDifferently}</div></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
            
             let html = `
                 <div class="flex flex-col md:flex-row justify-between items-start gap-6">
@@ -2294,15 +3253,9 @@
                         </div>
                     </div>
                 </div>
-               
-                ${trade.reason || trade.reasonHTML ? `
-                <div class="mt-10">
-                    <div class="text-zinc-400 text-sm mb-3 flex items-center gap-2">
-                        <i class="fas fa-notebook"></i>
-                        <span>Trade Reason / Setup Notebook</span>
-                    </div>
-                    ${notesHTML}
-                </div>` : ''}
+                
+                ${entryReasoningHTML}
+                ${exitNotesHTML}
                
                 ${screenshotsHTML}
             `;
@@ -2334,10 +3287,6 @@
        
         function closeModal() {
             document.getElementById('trade-modal').classList.add('hidden');
-        }
-       
-        function showNewTradeModal() {
-            navigate(1);
         }
        
         function showAccountsModal() {
@@ -2422,10 +3371,8 @@
             const confirmMsg = `Are you sure you want to permanently delete "${acc.name}"?\n\nThis will delete all ${acc.trades.length} trades and cannot be undone.`;
             if (!confirm(confirmMsg)) return;
             
-            // Remove the account
             accounts = accounts.filter(a => a.id !== accountId);
             
-            // If we deleted the current account, switch to the first remaining one
             if (currentAccountId === accountId) {
                 currentAccountId = accounts[0].id;
                 localStorage.setItem(`xaffordsfx_current_account_${currentUser.username}`, currentAccountId);
@@ -2434,7 +3381,6 @@
             saveCurrentAccountData();
             renderAccountsList();
             
-            // Refresh all views
             renderDashboard();
             if (!document.getElementById('journal-content').classList.contains('hidden')) renderJournal();
             if (!document.getElementById('analytics-content').classList.contains('hidden')) renderAnalytics();
@@ -2451,7 +3397,6 @@
                 return;
             }
             
-            // Check for duplicate names
             if (accounts.some(a => a.name.toLowerCase() === name.toLowerCase())) {
                 alert("An account with this name already exists");
                 return;
@@ -2484,10 +3429,12 @@
                 return;
             }
            
-            let csv = "Date,Pair,Direction,Entry,Exit,Lots,P/L,SL,TP,Reason,Screenshots\n";
+            let csv = "Date,Pair,Direction,Entry,Exit,Lots,P/L,SL,TP,HTFStructure,InverseStructure,BreakoutZone,EntrySetup,TPLevels,PlanFollowed,RulesFollowed,MarketStructure,TrendAligned,OutcomeReason,RespectedSL,SizeAppropriate,MaintainedRR,TPLevel,Screenshots\n";
             trades.forEach(t => {
                 const screenshotCount = t.screenshots ? t.screenshots.length : 0;
-                csv += `"${t.date}","${t.pair}","${t.direction}",${t.entry},${t.exit},${t.lots || 0},${t.pl || 0},${t.sl || ''},${t.tp || ''},"${(t.reason || '').replace(/"/g, '""')}",${screenshotCount}\n`;
+                const er = t.entryReasoning || {};
+                const en = t.exitNotes || {};
+                csv += `"${t.date}","${t.pair}","${t.direction}",${t.entry},${t.exit},${t.lots || 0},${t.pl || 0},${t.sl || ''},${t.tp || ''},${er.htfStructure ? 'Yes' : 'No'},${er.inverseStructure ? 'Yes' : 'No'},${er.breakoutZone ? 'Yes' : 'No'},${er.entrySetup ? 'Yes' : 'No'},${er.tpLevels ? 'Yes' : 'No'},${en.planFollowed || ''},${en.rulesFollowed || ''},${en.marketStructure || ''},${en.trendAligned || ''},${en.outcomeReason || ''},${en.respectedSL || ''},${en.sizeAppropriate || ''},${en.maintainedRR || ''},${en.tpLevel || ''},${screenshotCount}\n`;
             });
            
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -2522,18 +3469,6 @@
             previewEl.classList.remove('hidden');
         }
 
-        function formatText(type) {
-            const editor = document.getElementById('trade-reason-editor');
-            editor.focus();
-            
-            if (type === 'bold') {
-                document.execCommand('bold');
-            } else if (type === 'italic') {
-                document.execCommand('italic');
-            }
-        }
-
-        // Adjust Balance Functions
         let currentAdjustAccount = null;
 
         function showAdjustBalanceModal() {
@@ -2566,7 +3501,6 @@
                 return;
             }
             
-            const currentBalance = calculateCurrentBalance(currentAdjustAccount);
             const totalPL = currentAdjustAccount.trades.reduce((sum, t) => sum + (t.pl || 0), 0);
             
             currentAdjustAccount.startingBalance = newBalance - totalPL;
@@ -2581,7 +3515,6 @@
             alert(`Balance updated successfully! New balance: $${newBalance.toFixed(2)}`);
         }
 
-        // Initialize
         window.onload = function() {
             const savedUser = localStorage.getItem('xaffordsfx_current_user');
             if (savedUser) {
@@ -2596,7 +3529,7 @@
                 showLogin();
             }
             
-            console.log('%cXAffordsFX Professional Trading Journal v2.3 - Multi-Account + Delete', 'color:#00ff9d; font-weight:bold; font-size:14px');
+            console.log('%cXAffordsFX Professional Trading Journal v4.0 — Premium Calendar', 'color:#00ff9d; font-weight:bold; font-size:14px');
         };
 
         document.addEventListener('click', function(e) {
