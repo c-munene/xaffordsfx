@@ -1,0 +1,1 @@
+$(cat /tmp/xaffords/supabase/schema.sql)
