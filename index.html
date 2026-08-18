@@ -967,6 +967,50 @@
         input[type="date"], input[type="datetime-local"] {
             color-scheme: dark;
         }
+
+        /* ========== OPTIMIZED ANALYTICS ========== */
+        .analytics-metric {
+            background: linear-gradient(145deg, #18181b, #1f1f23);
+            border: 1px solid #27272a;
+            border-radius: 20px;
+            padding: 20px 22px;
+            transition: all 0.25s ease;
+        }
+        .analytics-metric:hover {
+            border-color: #3f3f46;
+            transform: translateY(-2px);
+        }
+        .analytics-metric .metric-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+        }
+        .analytics-metric .metric-value {
+            font-size: 1.85rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+            margin-top: 6px;
+        }
+        .analytics-metric .metric-sub {
+            font-size: 0.75rem;
+            color: #a1a1aa;
+            margin-top: 4px;
+        }
+        .dir-perf-card {
+            background: #141416;
+            border: 1px solid #2e2e33;
+            border-radius: 16px;
+            padding: 16px 18px;
+        }
+        .analytics-section-card {
+            background: linear-gradient(145deg, #18181b, #1f1f23);
+            border: 1px solid #27272a;
+            border-radius: 24px;
+            padding: 24px;
+        }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100">
@@ -1743,87 +1787,216 @@
                     </div>
                 </div>
                
-                <!-- Analytics Content -->
+                <!-- ========== OPTIMIZED ANALYTICS CONTENT ========== -->
                 <div id="analytics-content" class="hidden">
                     <div class="space-y-8">
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                        <!-- Primary Metrics Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="analytics-metric">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-zinc-400 text-sm">Net P/L</p>
-                                    <i class="fas fa-dollar-sign text-emerald-400"></i>
+                                    <span class="metric-label">Net P/L</span>
+                                    <i class="fas fa-dollar-sign text-emerald-400/80 text-sm"></i>
                                 </div>
-                                <p id="analytics-total-pl" class="text-4xl font-bold mt-3 profit">$0.00</p>
-                                <div id="analytics-total-pl-pct" class="text-xs mt-1 text-emerald-400">+0.00%</div>
+                                <div id="analytics-total-pl" class="metric-value profit">$0.00</div>
+                                <div id="analytics-total-pl-pct" class="metric-sub text-emerald-400">+0.00%</div>
                             </div>
-                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                            <div class="analytics-metric">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-zinc-400 text-sm">Win Rate</p>
-                                    <i class="fas fa-trophy text-amber-400"></i>
+                                    <span class="metric-label">Win Rate</span>
+                                    <i class="fas fa-trophy text-amber-400/80 text-sm"></i>
                                 </div>
-                                <p id="analytics-winrate" class="text-4xl font-bold mt-3">0.0%</p>
+                                <div id="analytics-winrate" class="metric-value">0.0%</div>
+                                <div id="analytics-wl-ratio" class="metric-sub">0W / 0L</div>
                             </div>
-                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                            <div class="analytics-metric">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-zinc-400 text-sm">Profit Factor</p>
-                                    <i class="fas fa-chart-line text-sky-400"></i>
+                                    <span class="metric-label">Profit Factor</span>
+                                    <i class="fas fa-chart-line text-sky-400/80 text-sm"></i>
                                 </div>
-                                <p id="analytics-profit-factor" class="text-4xl font-bold mt-3">0.00</p>
+                                <div id="analytics-profit-factor" class="metric-value">0.00</div>
+                                <div class="metric-sub">Gross Profit / Gross Loss</div>
                             </div>
-                            <div class="metric-card rounded-3xl p-6 border border-zinc-700">
+                            <div class="analytics-metric">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-zinc-400 text-sm">Expectancy</p>
-                                    <i class="fas fa-calculator text-violet-400"></i>
+                                    <span class="metric-label">Expectancy</span>
+                                    <i class="fas fa-calculator text-violet-400/80 text-sm"></i>
                                 </div>
-                                <p id="analytics-expectancy" class="text-4xl font-bold mt-3">$0.00</p>
+                                <div id="analytics-expectancy" class="metric-value">$0.00</div>
+                                <div class="metric-sub">Avg P/L per trade</div>
                             </div>
                         </div>
 
+                        <!-- Secondary Metrics -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="analytics-metric">
+                                <div class="flex items-center justify-between">
+                                    <span class="metric-label">Max Drawdown</span>
+                                    <i class="fas fa-arrow-trend-down text-red-400/80 text-sm"></i>
+                                </div>
+                                <div id="analytics-max-dd" class="metric-value text-red-400">$0.00</div>
+                                <div id="analytics-max-dd-pct" class="metric-sub">0.00%</div>
+                            </div>
+                            <div class="analytics-metric">
+                                <div class="flex items-center justify-between">
+                                    <span class="metric-label">Avg Win / Avg Loss</span>
+                                    <i class="fas fa-scale-balanced text-sky-400/80 text-sm"></i>
+                                </div>
+                                <div class="metric-value text-lg">
+                                    <span id="analytics-avg-win" class="text-emerald-400">$0</span>
+                                    <span class="text-zinc-600 mx-1">/</span>
+                                    <span id="analytics-avg-loss" class="text-red-400">$0</span>
+                                </div>
+                                <div class="metric-sub">Average per winning / losing trade</div>
+                            </div>
+                            <div class="analytics-metric">
+                                <div class="flex items-center justify-between">
+                                    <span class="metric-label">Best / Worst Trade</span>
+                                    <i class="fas fa-medal text-amber-400/80 text-sm"></i>
+                                </div>
+                                <div class="metric-value text-lg">
+                                    <span id="analytics-best-trade" class="text-emerald-400">$0</span>
+                                    <span class="text-zinc-600 mx-1">/</span>
+                                    <span id="analytics-worst-trade" class="text-red-400">$0</span>
+                                </div>
+                                <div class="metric-sub">Largest single win / loss</div>
+                            </div>
+                            <div class="analytics-metric">
+                                <div class="flex items-center justify-between">
+                                    <span class="metric-label">Total Trades</span>
+                                    <i class="fas fa-list-ol text-zinc-400 text-sm"></i>
+                                </div>
+                                <div id="analytics-total-trades" class="metric-value">0</div>
+                                <div id="analytics-trading-days" class="metric-sub">0 trading days</div>
+                            </div>
+                        </div>
+
+                        <!-- Direction Performance -->
+                        <div class="analytics-section-card">
+                            <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                                <i class="fas fa-arrows-alt-v text-emerald-400"></i>
+                                Direction Performance
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="dir-perf-card">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                                            <i class="fas fa-arrow-up text-emerald-400"></i>
+                                        </div>
+                                        <span class="font-semibold text-emerald-400">Longs</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3 text-center">
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Trades</div>
+                                            <div id="long-total" class="text-xl font-bold">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Win %</div>
+                                            <div id="long-winrate" class="text-xl font-bold text-emerald-400">0%</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Net P/L</div>
+                                            <div id="long-pl" class="text-xl font-bold">$0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dir-perf-card">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="w-8 h-8 rounded-xl bg-red-500/15 flex items-center justify-center">
+                                            <i class="fas fa-arrow-down text-red-400"></i>
+                                        </div>
+                                        <span class="font-semibold text-red-400">Shorts</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3 text-center">
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Trades</div>
+                                            <div id="short-total" class="text-xl font-bold">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Win %</div>
+                                            <div id="short-winrate" class="text-xl font-bold text-red-400">0%</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs text-zinc-500 mb-1">Net P/L</div>
+                                            <div id="short-pl" class="text-xl font-bold">$0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
-                                <div class="flex justify-between items-center mb-6">
+                            <div class="analytics-section-card">
+                                <div class="flex justify-between items-center mb-5">
                                     <h3 class="text-lg font-semibold flex items-center gap-2">
-                                        <i class="fas fa-chart-line"></i>
+                                        <i class="fas fa-chart-line text-emerald-400"></i>
                                         Equity Curve
                                     </h3>
                                 </div>
-                                <div class="chart-container" style="height: 320px;">
+                                <div class="chart-container" style="height: 300px;">
                                     <canvas id="equityChart"></canvas>
                                 </div>
                             </div>
                             
-                            <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
-                                <div class="flex justify-between items-center mb-6">
+                            <div class="analytics-section-card">
+                                <div class="flex justify-between items-center mb-5">
                                     <h3 class="text-lg font-semibold flex items-center gap-2">
-                                        <i class="fas fa-calendar"></i>
+                                        <i class="fas fa-calendar text-sky-400"></i>
                                         Monthly Performance
                                     </h3>
-                                    <select id="monthly-view-select" onchange="renderAnalytics()" class="bg-zinc-800 border border-zinc-700 rounded-xl text-sm px-3 py-1">
+                                    <select id="monthly-view-select" onchange="renderAnalytics()" class="bg-zinc-800 border border-zinc-700 rounded-xl text-sm px-3 py-1.5 focus:outline-none focus:border-emerald-500">
                                         <option value="bar">Bar Chart</option>
                                         <option value="line">Line Trend</option>
                                     </select>
                                 </div>
-                                <div class="chart-container" style="height: 320px;">
+                                <div class="chart-container" style="height: 300px;">
                                     <canvas id="monthlyChart"></canvas>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-zinc-900 rounded-3xl p-6 md:p-8 border border-zinc-800">
-                            <h3 class="text-lg font-semibold mb-6">Instrument Performance</h3>
-                            <div class="flex justify-center mb-8">
-                                <div class="w-full max-w-md">
-                                    <canvas id="pairPieChart" width="400" height="400"></canvas>
+                        <!-- Day of Week + Instrument -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="analytics-section-card">
+                                <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                                    <i class="fas fa-calendar-week text-violet-400"></i>
+                                    Performance by Day of Week
+                                </h3>
+                                <div class="chart-container" style="height: 280px;">
+                                    <canvas id="dowChart"></canvas>
                                 </div>
                             </div>
+
+                            <div class="analytics-section-card">
+                                <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                                    <i class="fas fa-chart-pie text-amber-400"></i>
+                                    Instrument Distribution
+                                </h3>
+                                <div class="flex justify-center">
+                                    <div class="w-full max-w-xs">
+                                        <canvas id="pairPieChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instrument Table -->
+                        <div class="analytics-section-card">
+                            <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                                <i class="fas fa-table text-emerald-400"></i>
+                                Instrument Performance Breakdown
+                            </h3>
                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm" id="pair-performance-table">
+                                <table class="w-full text-sm">
                                     <thead>
-                                        <tr class="border-b border-zinc-700">
-                                            <th class="text-left py-3">Pair</th>
-                                            <th class="text-right py-3">Trades</th>
-                                            <th class="text-right py-3">Win %</th>
-                                            <th class="text-right py-3">Avg P/L</th>
-                                            <th class="text-right py-3">Total P/L</th>
+                                        <tr class="border-b border-zinc-700 text-zinc-400">
+                                            <th class="text-left py-3 px-2 font-medium">Pair</th>
+                                            <th class="text-right py-3 px-2 font-medium">Trades</th>
+                                            <th class="text-right py-3 px-2 font-medium">Win %</th>
+                                            <th class="text-right py-3 px-2 font-medium">Avg P/L</th>
+                                            <th class="text-right py-3 px-2 font-medium">Total P/L</th>
+                                            <th class="text-right py-3 px-2 font-medium">Best</th>
+                                            <th class="text-right py-3 px-2 font-medium">Worst</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pair-tbody"></tbody>
@@ -1975,6 +2148,7 @@
         let pieChartInstance = null;
         let equityChartInstance = null;
         let monthlyChartInstance = null;
+        let dowChartInstance = null;
         let currentCalendarDate = new Date();
         let currentScreenshots = [];
         let calendarFilter = 'all';
@@ -2299,7 +2473,6 @@
 
         function setTradeDateToNow() {
             const now = new Date();
-            // Format for datetime-local: YYYY-MM-DDTHH:mm
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
@@ -2995,7 +3168,6 @@
             const account = getCurrentAccount();
             let trades = [...account.trades];
 
-            // Search
             const q = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
             if (q) {
                 trades = trades.filter(t => {
@@ -3007,7 +3179,6 @@
                 });
             }
 
-            // Date range
             const from = document.getElementById('filter-date-from')?.value;
             const to = document.getElementById('filter-date-to')?.value;
             if (from) {
@@ -3021,20 +3192,16 @@
                 trades = trades.filter(t => new Date(t.date) <= toDate);
             }
 
-            // Result
             if (journalFilters.result === 'win') trades = trades.filter(t => t.pl > 0);
             else if (journalFilters.result === 'loss') trades = trades.filter(t => t.pl < 0);
 
-            // Direction
             if (journalFilters.direction !== 'all') {
                 trades = trades.filter(t => t.direction === journalFilters.direction);
             }
 
-            // P/L profitability (same as result but kept for clarity)
             if (journalFilters.pl === 'profit') trades = trades.filter(t => t.pl > 0);
             else if (journalFilters.pl === 'loss') trades = trades.filter(t => t.pl < 0);
 
-            // Sort
             trades.sort((a, b) => {
                 let va, vb;
                 switch (currentSort.column) {
@@ -3097,7 +3264,6 @@
             const filtered = getFilteredTrades();
             updateJournalStats(filtered);
 
-            // Running balance map (chronological)
             const allSorted = [...account.trades].sort((a, b) => new Date(a.date) - new Date(b.date));
             let running = account.startingBalance;
             const balanceMap = new Map();
@@ -3118,7 +3284,6 @@
             document.getElementById('prev-page-btn').disabled = currentPage <= 1;
             document.getElementById('next-page-btn').disabled = currentPage >= totalPages;
 
-            // Update sort indicators
             document.querySelectorAll('.journal-table th[data-sort]').forEach(th => {
                 th.classList.remove('sort-asc', 'sort-desc');
                 if (th.dataset.sort === currentSort.column) {
@@ -3126,7 +3291,6 @@
                 }
             });
 
-            // Desktop table
             const tbody = document.getElementById('journal-table');
             tbody.innerHTML = '';
 
@@ -3204,7 +3368,6 @@
                 });
             }
 
-            // Mobile cards
             const cardsContainer = document.getElementById('journal-cards');
             cardsContainer.innerHTML = '';
 
@@ -3331,60 +3494,139 @@
             if (trade) showTradeDetail(trade);
         }
        
+        // ========== OPTIMIZED ANALYTICS ==========
         function renderAnalytics() {
             const account = getCurrentAccount();
             const trades = account.trades;
+            
+            // Reset if empty
             if (!trades.length) {
                 document.getElementById('analytics-total-pl').textContent = '$0.00';
-                document.getElementById('analytics-total-pl').className = 'text-4xl font-bold mt-3 profit';
+                document.getElementById('analytics-total-pl').className = 'metric-value profit';
                 document.getElementById('analytics-total-pl-pct').textContent = '+0.00%';
                 document.getElementById('analytics-winrate').textContent = '0.0%';
+                document.getElementById('analytics-wl-ratio').textContent = '0W / 0L';
                 document.getElementById('analytics-profit-factor').textContent = '0.00';
                 document.getElementById('analytics-expectancy').textContent = '$0.00';
+                document.getElementById('analytics-max-dd').textContent = '$0.00';
+                document.getElementById('analytics-max-dd-pct').textContent = '0.00%';
+                document.getElementById('analytics-avg-win').textContent = '$0';
+                document.getElementById('analytics-avg-loss').textContent = '$0';
+                document.getElementById('analytics-best-trade').textContent = '$0';
+                document.getElementById('analytics-worst-trade').textContent = '$0';
+                document.getElementById('analytics-total-trades').textContent = '0';
+                document.getElementById('analytics-trading-days').textContent = '0 trading days';
+                document.getElementById('long-total').textContent = '0';
+                document.getElementById('long-winrate').textContent = '0%';
+                document.getElementById('long-pl').textContent = '$0';
+                document.getElementById('short-total').textContent = '0';
+                document.getElementById('short-winrate').textContent = '0%';
+                document.getElementById('short-pl').textContent = '$0';
                 
                 if (equityChartInstance) equityChartInstance.destroy();
                 if (monthlyChartInstance) monthlyChartInstance.destroy();
                 if (pieChartInstance) pieChartInstance.destroy();
+                if (dowChartInstance) dowChartInstance.destroy();
                 
                 document.getElementById('pair-tbody').innerHTML = '';
                 return;
             }
             
-            const totalPL = trades.reduce((sum, t) => sum + (t.pl || 0), 0);
             const starting = account.startingBalance;
+            const totalPL = trades.reduce((sum, t) => sum + (t.pl || 0), 0);
             const pct = ((totalPL / starting) * 100).toFixed(2);
             
+            // Primary metrics
             document.getElementById('analytics-total-pl').textContent = (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(2);
-            document.getElementById('analytics-total-pl').className = totalPL >= 0 ? 'text-4xl font-bold mt-3 profit' : 'text-4xl font-bold mt-3 loss';
+            document.getElementById('analytics-total-pl').className = 'metric-value ' + (totalPL >= 0 ? 'profit' : 'loss');
             document.getElementById('analytics-total-pl-pct').textContent = (totalPL >= 0 ? '+' : '') + pct + '%';
-            document.getElementById('analytics-total-pl-pct').className = totalPL >= 0 ? 'text-xs mt-1 text-emerald-400' : 'text-xs mt-1 text-red-400';
+            document.getElementById('analytics-total-pl-pct').className = 'metric-sub ' + (totalPL >= 0 ? 'text-emerald-400' : 'text-red-400');
             
-            const winRate = calculateWinRate(account);
+            const wins = trades.filter(t => t.pl > 0);
+            const losses = trades.filter(t => t.pl < 0);
+            const winRate = (wins.length / trades.length * 100);
             document.getElementById('analytics-winrate').textContent = winRate.toFixed(1) + '%';
+            document.getElementById('analytics-wl-ratio').textContent = `${wins.length}W / ${losses.length}L`;
             
             let grossProfit = 0, grossLoss = 0;
             trades.forEach(t => {
                 if (t.pl > 0) grossProfit += t.pl;
                 else grossLoss += Math.abs(t.pl);
             });
-            const profitFactor = grossLoss ? (grossProfit / grossLoss).toFixed(2) : '∞';
+            const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '0.00');
             document.getElementById('analytics-profit-factor').textContent = profitFactor;
             
-            const expectancy = trades.length ? totalPL / trades.length : 0;
+            const expectancy = totalPL / trades.length;
             document.getElementById('analytics-expectancy').textContent = (expectancy >= 0 ? '+' : '') + '$' + expectancy.toFixed(2);
             
+            // Max Drawdown
+            const sorted = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let peak = starting;
+            let equity = starting;
+            let maxDD = 0;
+            let maxDDPct = 0;
+            sorted.forEach(t => {
+                equity += (t.pl || 0);
+                if (equity > peak) peak = equity;
+                const dd = peak - equity;
+                if (dd > maxDD) {
+                    maxDD = dd;
+                    maxDDPct = peak > 0 ? (dd / peak * 100) : 0;
+                }
+            });
+            document.getElementById('analytics-max-dd').textContent = '-$' + maxDD.toFixed(2);
+            document.getElementById('analytics-max-dd-pct').textContent = maxDDPct.toFixed(2) + '%';
+            
+            // Avg Win / Avg Loss
+            const avgWin = wins.length ? (wins.reduce((s, t) => s + t.pl, 0) / wins.length) : 0;
+            const avgLoss = losses.length ? (losses.reduce((s, t) => s + Math.abs(t.pl), 0) / losses.length) : 0;
+            document.getElementById('analytics-avg-win').textContent = '$' + avgWin.toFixed(0);
+            document.getElementById('analytics-avg-loss').textContent = '$' + avgLoss.toFixed(0);
+            
+            // Best / Worst
+            const best = Math.max(...trades.map(t => t.pl || 0));
+            const worst = Math.min(...trades.map(t => t.pl || 0));
+            document.getElementById('analytics-best-trade').textContent = '+$' + best.toFixed(0);
+            document.getElementById('analytics-worst-trade').textContent = '$' + worst.toFixed(0);
+            
+            // Total trades & trading days
+            document.getElementById('analytics-total-trades').textContent = trades.length;
+            const dailyStats = getDailyStats(account);
+            const tradingDaysCount = Object.values(dailyStats).filter(d => d.count > 0).length;
+            document.getElementById('analytics-trading-days').textContent = tradingDaysCount + ' trading days';
+            
+            // Direction performance
+            const longs = trades.filter(t => t.direction === 'Buy');
+            const shorts = trades.filter(t => t.direction === 'Sell');
+            const longWins = longs.filter(t => t.pl > 0).length;
+            const shortWins = shorts.filter(t => t.pl > 0).length;
+            const longPL = longs.reduce((s, t) => s + (t.pl || 0), 0);
+            const shortPL = shorts.reduce((s, t) => s + (t.pl || 0), 0);
+            
+            document.getElementById('long-total').textContent = longs.length;
+            document.getElementById('long-winrate').textContent = longs.length ? (longWins / longs.length * 100).toFixed(0) + '%' : '0%';
+            const longPlEl = document.getElementById('long-pl');
+            longPlEl.textContent = formatPLFull(longPL);
+            longPlEl.className = 'text-xl font-bold ' + (longPL >= 0 ? 'text-emerald-400' : 'text-red-400');
+            
+            document.getElementById('short-total').textContent = shorts.length;
+            document.getElementById('short-winrate').textContent = shorts.length ? (shortWins / shorts.length * 100).toFixed(0) + '%' : '0%';
+            const shortPlEl = document.getElementById('short-pl');
+            shortPlEl.textContent = formatPLFull(shortPL);
+            shortPlEl.className = 'text-xl font-bold ' + (shortPL >= 0 ? 'text-emerald-400' : 'text-red-400');
+            
+            // Equity Curve
             const ctxEquity = document.getElementById('equityChart');
             if (equityChartInstance) equityChartInstance.destroy();
            
             let equityData = [starting];
             let dates = ['Start'];
             let currentEq = starting;
-            const sorted = [...trades].sort((a,b) => new Date(a.date) - new Date(b.date));
            
             sorted.forEach(t => {
                 currentEq += t.pl || 0;
                 equityData.push(currentEq);
-                dates.push(new Date(t.date).toLocaleDateString('short'));
+                dates.push(new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
             });
            
             equityChartInstance = new Chart(ctxEquity, {
@@ -3395,13 +3637,13 @@
                         label: 'Account Equity',
                         data: equityData,
                         borderColor: '#00ff9d',
-                        borderWidth: 3.5,
+                        borderWidth: 2.5,
                         tension: 0.35,
                         pointRadius: 0,
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 5,
                         pointBackgroundColor: '#00ff9d',
                         fill: true,
-                        backgroundColor: 'rgba(0, 255, 157, 0.12)'
+                        backgroundColor: 'rgba(0, 255, 157, 0.08)'
                     }]
                 },
                 options: { 
@@ -3414,17 +3656,27 @@
                             backgroundColor: '#18181b',
                             titleColor: '#a1a1aa',
                             bodyColor: '#00ff9d',
+                            borderColor: '#27272a',
+                            borderWidth: 1,
                             displayColors: false,
                             callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) }
                         }
                     },
                     scales: {
-                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 11 } }, border: { dash: [2, 2] } },
-                        x: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { size: 11 }, maxRotation: 45 } }
+                        y: { 
+                            grid: { color: '#27272a' }, 
+                            ticks: { color: '#a1a1aa', font: { size: 11 }, callback: v => '$' + v.toLocaleString() }, 
+                            border: { display: false }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { color: '#71717a', font: { size: 10 }, maxRotation: 45, maxTicksLimit: 8 }
+                        }
                     }
                 }
             });
            
+            // Monthly Performance
             const monthlyPLMap = {};
             sorted.forEach(t => {
                 const m = new Date(t.date).toISOString().slice(0,7);
@@ -3442,15 +3694,20 @@
             monthlyChartInstance = new Chart(ctxMonthly, {
                 type: viewType === 'line' ? 'line' : 'bar',
                 data: {
-                    labels: monthlyLabels,
+                    labels: monthlyLabels.map(m => {
+                        const [y, mo] = m.split('-');
+                        return new Date(y, mo - 1).toLocaleString('default', { month: 'short', year: '2-digit' });
+                    }),
                     datasets: [{
                         label: 'Monthly P/L',
                         data: monthlyValues,
                         borderColor: '#00ff9d',
-                        backgroundColor: monthlyValues.map(v => v >= 0 ? 'rgba(0, 255, 157, 0.7)' : 'rgba(239, 68, 68, 0.7)'),
-                        borderWidth: viewType === 'line' ? 3 : 0,
+                        backgroundColor: monthlyValues.map(v => v >= 0 ? 'rgba(0, 255, 157, 0.65)' : 'rgba(239, 68, 68, 0.65)'),
+                        borderWidth: viewType === 'line' ? 2.5 : 0,
                         tension: 0.3,
-                        borderRadius: 6
+                        borderRadius: 6,
+                        pointRadius: viewType === 'line' ? 4 : 0,
+                        pointBackgroundColor: '#00ff9d'
                     }]
                 },
                 options: { 
@@ -3458,15 +3715,73 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) } }
+                        tooltip: { 
+                            backgroundColor: '#18181b',
+                            borderColor: '#27272a',
+                            borderWidth: 1,
+                            callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) } 
+                        }
                     },
                     scales: {
-                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } },
-                        x: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } }
+                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', callback: v => '$' + v }, border: { display: false } },
+                        x: { grid: { display: false }, ticks: { color: '#71717a' } }
                     }
                 }
             });
            
+            // Day of Week Performance
+            const dowMap = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+            const dowCount = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+            trades.forEach(t => {
+                if (!t.date) return;
+                const day = new Date(t.date).getDay();
+                dowMap[day] += (t.pl || 0);
+                dowCount[day]++;
+            });
+            const dowLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dowValues = [0,1,2,3,4,5,6].map(d => dowMap[d]);
+            
+            const ctxDow = document.getElementById('dowChart');
+            if (dowChartInstance) dowChartInstance.destroy();
+            
+            dowChartInstance = new Chart(ctxDow, {
+                type: 'bar',
+                data: {
+                    labels: dowLabels,
+                    datasets: [{
+                        label: 'P/L by Day',
+                        data: dowValues,
+                        backgroundColor: dowValues.map(v => v >= 0 ? 'rgba(0, 255, 157, 0.65)' : 'rgba(239, 68, 68, 0.65)'),
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#18181b',
+                            borderColor: '#27272a',
+                            borderWidth: 1,
+                            callbacks: {
+                                afterLabel: (ctx) => {
+                                    const d = ctx.dataIndex;
+                                    return dowCount[d] + ' trade' + (dowCount[d] !== 1 ? 's' : '');
+                                },
+                                label: (ctx) => formatPLFull(ctx.raw)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', callback: v => '$' + v }, border: { display: false } },
+                        x: { grid: { display: false }, ticks: { color: '#a1a1aa' } }
+                    }
+                }
+            });
+           
+            // Instrument Pie
             const pairCount = {};
             trades.forEach(trade => {
                 pairCount[trade.pair] = (pairCount[trade.pair] || 0) + 1;
@@ -3480,49 +3795,58 @@
             if (pieChartInstance) pieChartInstance.destroy();
            
             pieChartInstance = new Chart(ctxPie, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: labels.length ? labels : ['No Data'],
                     datasets: [{
                         data: data.length ? data : [1],
                         backgroundColor: ['#22d3ee', '#a5b4fc', '#34d399', '#f472b6', '#fbbf24', '#60a5fa', '#c084fc', '#f87171'],
                         borderColor: '#18181b',
-                        borderWidth: 5
+                        borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    cutout: '58%',
                     plugins: { 
-                        legend: { position: 'bottom', labels: { color: '#d1d5db', padding: 18, font: { size: 13 } } }
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#d1d5db', padding: 14, font: { size: 12 }, boxWidth: 12 } 
+                        }
                     }
                 }
             });
            
+            // Instrument table
             const tbody = document.getElementById('pair-tbody');
             tbody.innerHTML = '';
            
             const pairStats = {};
             trades.forEach(t => {
                 if (!pairStats[t.pair]) {
-                    pairStats[t.pair] = { trades: 0, wins: 0, pl: 0 };
+                    pairStats[t.pair] = { trades: 0, wins: 0, pl: 0, best: -Infinity, worst: Infinity };
                 }
                 pairStats[t.pair].trades++;
                 if (t.pl > 0) pairStats[t.pair].wins++;
                 pairStats[t.pair].pl += t.pl || 0;
+                if ((t.pl || 0) > pairStats[t.pair].best) pairStats[t.pair].best = t.pl || 0;
+                if ((t.pl || 0) < pairStats[t.pair].worst) pairStats[t.pair].worst = t.pl || 0;
             });
            
             Object.entries(pairStats).sort((a,b) => b[1].pl - a[1].pl).forEach(([pair, stats]) => {
                 const winPct = (stats.wins / stats.trades * 100).toFixed(1);
                 const avgPL = (stats.pl / stats.trades).toFixed(2);
                 const row = document.createElement('tr');
-                row.className = 'border-b border-zinc-800 hover:bg-zinc-800/50';
+                row.className = 'border-b border-zinc-800/80 hover:bg-zinc-800/40 transition';
                 row.innerHTML = `
-                    <td class="py-4 font-medium">${pair}</td>
-                    <td class="py-4 text-right">${stats.trades}</td>
-                    <td class="py-4 text-right">${winPct}%</td>
-                    <td class="py-4 text-right font-mono">$${avgPL}</td>
-                    <td class="py-4 text-right font-semibold ${stats.pl >= 0 ? 'profit' : 'loss'}">$${(stats.pl).toFixed(2)}</td>
+                    <td class="py-3.5 px-2 font-mono font-semibold">${pair}</td>
+                    <td class="py-3.5 px-2 text-right text-zinc-300">${stats.trades}</td>
+                    <td class="py-3.5 px-2 text-right">${winPct}%</td>
+                    <td class="py-3.5 px-2 text-right font-mono ${parseFloat(avgPL) >= 0 ? 'text-emerald-400' : 'text-red-400'}">$${avgPL}</td>
+                    <td class="py-3.5 px-2 text-right font-semibold font-mono ${stats.pl >= 0 ? 'profit' : 'loss'}">${formatPLFull(stats.pl)}</td>
+                    <td class="py-3.5 px-2 text-right font-mono text-emerald-400">+$${stats.best.toFixed(0)}</td>
+                    <td class="py-3.5 px-2 text-right font-mono text-red-400">$${stats.worst.toFixed(0)}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -3669,27 +3993,6 @@
                
                 ${screenshotsHTML}
             `;
-           
-            content.innerHTML = html;
-            modal.classList.remove('hidden');
-        }
-       
-        function viewScreenshots(tradeId) {
-            const account = getCurrentAccount();
-            const trade = account.trades.find(t => t.id === tradeId);
-            if (!trade || !trade.screenshots || trade.screenshots.length === 0) return;
-           
-            const modal = document.getElementById('trade-modal');
-            const content = document.getElementById('modal-content');
-           
-            let html = `
-                <div class="bg-zinc-950 p-4 rounded-3xl border border-zinc-700">
-                    <div class="screenshot-grid">
-                        ${trade.screenshots.map(src => `
-                            <img src="${src}" class="rounded-2xl w-full cursor-pointer" onclick="showLightbox('${src}')" alt="Trade chart">
-                        `).join('')}
-                    </div>
-                </div>`;
            
             content.innerHTML = html;
             modal.classList.remove('hidden');
@@ -3939,7 +4242,7 @@
                 showLogin();
             }
             
-            console.log('%cXAffordsFX Professional Trading Journal v4.1 — Optimized Journal History', 'color:#00ff9d; font-weight:bold; font-size:14px');
+            console.log('%cXAffordsFX Professional Trading Journal v4.2 — Optimized Analytics', 'color:#00ff9d; font-weight:bold; font-size:14px');
         };
 
         document.addEventListener('click', function(e) {
