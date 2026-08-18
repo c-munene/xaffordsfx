@@ -1,65 +1,31 @@
-# XAffordsFX ↔ Supabase – Full Connection Setup
+# XAffordsFX — Supabase Setup
 
-Live site: https://c-munene.github.io/xaffordsfx/  
-Supabase project: `https://zalffliufmwajxcwkzrq.supabase.co`
+## Project
+- URL: `https://zalffliufmwajxcwkzrq.supabase.co`
+- Anon key is embedded in `index.html` (publishable key)
 
-The frontend is already wired (URL + anon key in `index.html`).  
-What was missing: **table grants + RLS policies + signup trigger**.
+## Database
+Run the SQL in the Supabase SQL Editor (see conversation or `supabase_schema.sql`).
 
-## 1. Run the SQL (required – 2 minutes)
+Tables:
+- `profiles` (id, username, email)
+- `accounts` (id, user_id, name, starting_balance)
+- `trades` (id, account_id, user_id, date, pair, direction, entry, exit, sl, tp, lots, pl, screenshots, entry_reasoning, exit_notes, multiplier)
 
-1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project `zalffliufmwajxcwkzrq`
-2. Go to **SQL Editor** → **New query**
-3. Paste the entire contents of [`supabase_schema.sql`](./supabase_schema.sql)
-4. Click **Run**
+RLS is enabled so users only see their own data.
 
-You should see success (no errors). This will:
+A trigger on `auth.users` automatically creates a profile + "Main Account" on signup.
 
-- Ensure `profiles`, `accounts`, `trades` tables exist with the correct columns
-- Grant permissions to `authenticated` / `anon`
-- Enable Row Level Security so each user only sees their own data
-- Auto-create a profile + **Main Account** when someone signs up
+## Auth
+- Email/password
+- Confirm email should be **OFF** in Authentication → Providers → Email
 
-## 2. Auth settings (recommended)
+## Frontend
+Single-page app (`index.html`) uses the Supabase JS client (CDN).
 
-**Authentication → Providers → Email**
+- Signup / Login / Logout → Supabase Auth
+- Accounts & trades → real-time DB queries
+- Multi-device: log in anywhere with the same email/password and see the same data
 
-- Email provider: **Enabled**
-- For quick testing: turn **Confirm email** OFF (so signup works immediately without inbox)
-- Or leave confirmation ON and use a real email you can access
-
-## 3. Test the connection
-
-1. Open https://c-munene.github.io/xaffordsfx/
-2. **Sign up** with email + password + username
-3. You should land on the Dashboard with a **Main Account** ($10,000)
-4. Log a trade → it should appear in Journal and persist after refresh
-5. Open another browser / incognito → data should still be there after login
-
-## 4. Verify in Supabase
-
-- **Table Editor** → `profiles` / `accounts` / `trades` should show your rows
-- **Authentication → Users** should list the new user
-
-## Schema overview (matches the app)
-
-| Table     | Key columns |
-|-----------|-------------|
-| profiles  | `id` (FK auth.users), `username` |
-| accounts  | `id`, `user_id`, `name`, `starting_balance`, `created_at` |
-| trades    | `id`, `account_id`, `user_id`, `date`, `pair`, `direction`, `entry`, `exit`, `sl`, `tp`, `lots`, `pl`, `screenshots` (jsonb), `entry_reasoning` (jsonb), `exit_notes` (jsonb), `multiplier` |
-
-Screenshots are stored as base64 data URLs inside the `screenshots` JSON array (no Storage bucket required).
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| `permission denied for table accounts` | You have not run `supabase_schema.sql` yet (or grants failed) |
-| Signup works but empty dashboard | Trigger not installed – re-run the SQL |
-| "Email not confirmed" | Disable confirm email or confirm via the link |
-| Login fails after signup | Check Authentication → Users; confirm user exists |
-
-## Security note
-
-The anon key in `index.html` is **public by design** (browser apps). Real security is RLS + policies in this SQL file. Never put the **service_role** key in frontend code.
+## Live site
+GitHub Pages: https://c-munene.github.io/xaffordsfx/
