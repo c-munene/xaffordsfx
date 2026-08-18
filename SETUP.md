@@ -1,11 +1,11 @@
-# XAffordsFX — Supabase Setup
+# XAffordsFX — Supabase Setup (reconnected from scratch)
 
 ## Project
 - URL: `https://zalffliufmwajxcwkzrq.supabase.co`
-- Anon key is embedded in `index.html` (publishable key)
+- Anon key is embedded in `index.html`
 
 ## Database
-Run the SQL in the Supabase SQL Editor (see conversation or `supabase_schema.sql`).
+Run the SQL in the Supabase SQL Editor (see `supabase_schema.sql`).
 
 Tables:
 - `profiles` (id, username, email)
