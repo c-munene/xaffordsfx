@@ -1,6 +1,7 @@
 -- ============================================================
 -- XAffordsFX - Complete Supabase Schema (from scratch)
 -- Original index.html is LEFT COMPLETELY UNCHANGED
+-- Optimized for seamless signup/login (Aug 2026)
 -- ============================================================
 
 -- 1. Enable required extensions
@@ -10,7 +11,7 @@ create extension if not exists "pgcrypto";
 -- ============================================================
 -- 2. Profiles (extends Supabase Auth)
 -- ============================================================
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text unique not null,
   email text,
@@ -20,23 +21,34 @@ create table public.profiles (
   updated_at timestamptz default now() not null
 );
 
--- Auto-create profile when a new user signs up
+-- Auto-create profile + default trading account when a new user signs up
+-- (security definer so it bypasses RLS and works even when email confirmation is required)
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 begin
+  -- Create profile
   insert into public.profiles (id, username, email)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
     new.email
-  );
+  )
+  on conflict (id) do nothing;
+
+  -- Create default trading account (Main Account)
+  insert into public.trading_accounts (user_id, name, starting_balance, is_default)
+  values (new.id, 'Main Account', 10000.00, true)
+  on conflict do nothing;
+
   return new;
 end;
 $$;
 
+-- Drop existing trigger if present, then recreate
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
@@ -44,7 +56,7 @@ create trigger on_auth_user_created
 -- ============================================================
 -- 3. Trading Accounts
 -- ============================================================
-create table public.trading_accounts (
+create table if not exists public.trading_accounts (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   name text not null,
@@ -56,12 +68,12 @@ create table public.trading_accounts (
   constraint trading_accounts_name_unique unique (user_id, name)
 );
 
-create index trading_accounts_user_id_idx on public.trading_accounts(user_id);
+create index if not exists trading_accounts_user_id_idx on public.trading_accounts(user_id);
 
 -- ============================================================
 -- 4. Trades
 -- ============================================================
-create table public.trades (
+create table if not exists public.trades (
   id uuid primary key default uuid_generate_v4(),
   account_id uuid not null references public.trading_accounts(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -103,15 +115,15 @@ create table public.trades (
   updated_at timestamptz default now() not null
 );
 
-create index trades_account_id_idx on public.trades(account_id);
-create index trades_user_id_idx on public.trades(user_id);
-create index trades_trade_date_idx on public.trades(trade_date desc);
-create index trades_pair_idx on public.trades(pair);
+create index if not exists trades_account_id_idx on public.trades(account_id);
+create index if not exists trades_user_id_idx on public.trades(user_id);
+create index if not exists trades_trade_date_idx on public.trades(trade_date desc);
+create index if not exists trades_pair_idx on public.trades(pair);
 
 -- ============================================================
 -- 5. Trade Screenshots (metadata only – files live in Storage)
 -- ============================================================
-create table public.trade_screenshots (
+create table if not exists public.trade_screenshots (
   id uuid primary key default uuid_generate_v4(),
   trade_id uuid not null references public.trades(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -122,7 +134,7 @@ create table public.trade_screenshots (
   created_at timestamptz default now() not null
 );
 
-create index trade_screenshots_trade_id_idx on public.trade_screenshots(trade_id);
+create index if not exists trade_screenshots_trade_id_idx on public.trade_screenshots(trade_id);
 
 -- ============================================================
 -- 6. Updated_at triggers
@@ -137,14 +149,17 @@ begin
 end;
 $$;
 
+drop trigger if exists profiles_updated_at on public.profiles;
 create trigger profiles_updated_at
   before update on public.profiles
   for each row execute procedure public.set_updated_at();
 
+drop trigger if exists trading_accounts_updated_at on public.trading_accounts;
 create trigger trading_accounts_updated_at
   before update on public.trading_accounts
   for each row execute procedure public.set_updated_at();
 
+drop trigger if exists trades_updated_at on public.trades;
 create trigger trades_updated_at
   before update on public.trades
   for each row execute procedure public.set_updated_at();
@@ -157,64 +172,65 @@ alter table public.trading_accounts enable row level security;
 alter table public.trades enable row level security;
 alter table public.trade_screenshots enable row level security;
 
--- Profiles policies
+-- Drop existing policies to avoid conflicts, then recreate
+drop policy if exists "Users can view own profile" on public.profiles;
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can view own profile"
   on public.profiles for select
   using (auth.uid() = id);
-
 create policy "Users can update own profile"
   on public.profiles for update
   using (auth.uid() = id);
 
--- Trading Accounts policies
+drop policy if exists "Users can view own accounts" on public.trading_accounts;
+drop policy if exists "Users can insert own accounts" on public.trading_accounts;
+drop policy if exists "Users can update own accounts" on public.trading_accounts;
+drop policy if exists "Users can delete own accounts" on public.trading_accounts;
 create policy "Users can view own accounts"
   on public.trading_accounts for select
   using (auth.uid() = user_id);
-
 create policy "Users can insert own accounts"
   on public.trading_accounts for insert
   with check (auth.uid() = user_id);
-
 create policy "Users can update own accounts"
   on public.trading_accounts for update
   using (auth.uid() = user_id);
-
 create policy "Users can delete own accounts"
   on public.trading_accounts for delete
   using (auth.uid() = user_id);
 
--- Trades policies
+drop policy if exists "Users can view own trades" on public.trades;
+drop policy if exists "Users can insert own trades" on public.trades;
+drop policy if exists "Users can update own trades" on public.trades;
+drop policy if exists "Users can delete own trades" on public.trades;
 create policy "Users can view own trades"
   on public.trades for select
   using (auth.uid() = user_id);
-
 create policy "Users can insert own trades"
   on public.trades for insert
   with check (auth.uid() = user_id);
-
 create policy "Users can update own trades"
   on public.trades for update
   using (auth.uid() = user_id);
-
 create policy "Users can delete own trades"
   on public.trades for delete
   using (auth.uid() = user_id);
 
--- Screenshots policies
+drop policy if exists "Users can view own screenshots" on public.trade_screenshots;
+drop policy if exists "Users can insert own screenshots" on public.trade_screenshots;
+drop policy if exists "Users can delete own screenshots" on public.trade_screenshots;
 create policy "Users can view own screenshots"
   on public.trade_screenshots for select
   using (auth.uid() = user_id);
-
 create policy "Users can insert own screenshots"
   on public.trade_screenshots for insert
   with check (auth.uid() = user_id);
-
 create policy "Users can delete own screenshots"
   on public.trade_screenshots for delete
   using (auth.uid() = user_id);
 
 -- ============================================================
--- 8. Helpful views (optional but useful)
+-- 8. Helpful views
 -- ============================================================
 create or replace view public.account_summary as
 select
@@ -234,4 +250,5 @@ group by ta.id, ta.user_id, ta.name, ta.starting_balance;
 -- ============================================================
 -- DONE
 -- Run this entire file in the Supabase SQL Editor
+-- (safe to re-run – uses IF NOT EXISTS / DROP IF EXISTS)
 -- ============================================================
